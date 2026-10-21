@@ -620,6 +620,18 @@
     select(start < 0 ? 0 : start);
   }
 
+  /* ---- v70: card 04 on-set monitor — BTS photos cycle with a running timecode while visible ---- */
+  const setMon = $('.set-mon');
+  if (setMon) {
+    const shots = $$('img', setMon), sc = $('#set-sc'), tcEl = $('#set-tc'); let k = 0, st = null, t0 = 0;
+    const tick = () => { shots[k].classList.remove('on'); k = (k + 1) % shots.length; shots[k].classList.add('on'); sc.textContent = shots[k].dataset.sc; };
+    const clock = () => { if (!st) return; const f = Math.floor((performance.now() - t0) / 1000 * 24), p = n => String(n).padStart(2, '0'); tcEl.textContent = `00:${p(Math.floor(f / 1440) % 60)}:${p(Math.floor(f / 24) % 60)}:${p(f % 24)}`; requestAnimationFrame(clock); };
+    new IntersectionObserver(([en]) => {
+      if (en.isIntersecting && !reduce) { if (!st) { st = setInterval(tick, 3200); t0 = t0 || performance.now(); requestAnimationFrame(clock); } }
+      else { clearInterval(st); st = null; }
+    }, { threshold: .3 }).observe(setMon);
+  }
+
   /* ---- v69: ads card — MeriA hooks play only while visible; frames switch 9:16 <-> 4:5 ---- */
   const ads = $('.vis-ads2');
   if (ads) {
