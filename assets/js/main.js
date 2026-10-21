@@ -6,7 +6,8 @@
   /* v56: inline-only video. iOS in-app browsers ignore playsinline, so they get posters instead of autoplay;
      any clip that still opens fullscreen by itself is closed and autoplay stops for the visit */
   const ua = navigator.userAgent;
-  let noAuto = /iPhone|iPad|iPod/.test(ua) && /FBAN|FBAV|FB_IAB|Messenger|Instagram|Zalo|Line\/|musical_ly|BytedanceWebview|TikTok/i.test(ua);
+  // v79: in-app browsers try inline autoplay too; if one still forces a video fullscreen, the guards below close it and stop autoplay for the visit
+  let noAuto = false;
   const stopAll = () => document.querySelectorAll('video').forEach(v => v.pause());
   const play = v => noAuto ? Promise.reject(new Error('inline playback unavailable')) : HTMLMediaElement.prototype.play.call(v);
   document.addEventListener('webkitbeginfullscreen', e => { const v = e.target; if (v.controls) return; noAuto = true; if (v.webkitExitFullscreen) v.webkitExitFullscreen(); stopAll(); }, true);
@@ -261,7 +262,10 @@
     const attach = () => { if (hvid.src || lite || noAuto) return; hvid.src = innerWidth < 900 ? hvid.dataset.srcM : hvid.dataset.src; hvid.preload = 'auto'; };
     if (document.readyState === 'complete') attach(); else addEventListener('load', attach, { once: true });
     setTimeout(attach, 3000);
-    if (!lite) new IntersectionObserver(([en]) => { if (en.isIntersecting) { attach(); play(hvid).catch(() => {}); } else hvid.pause(); }, { threshold: .05 }).observe(hvid);
+    let heroSeen = false;
+    if (!lite) new IntersectionObserver(([en]) => { heroSeen = en.isIntersecting; if (en.isIntersecting) { attach(); play(hvid).catch(() => {}); } else hvid.pause(); }, { threshold: .05 }).observe(hvid);
+    // iPhone Low Power Mode blocks autoplay until the first touch: try again then
+    if (!lite) ['touchstart', 'pointerdown', 'scroll'].forEach(ev => addEventListener(ev, () => { if (heroSeen && hvid.paused) { attach(); play(hvid).catch(() => {}); } }, { once: true, passive: true }));
   }
 
 
@@ -477,7 +481,7 @@
   swBtn && swBtn.addEventListener('click', () => { const on = swBtn.getAttribute('aria-pressed') !== 'true'; swBtn.setAttribute('aria-pressed', String(on)); $('#screen').classList.toggle('wire-hold', on); });
 
   /* ---- v9: live screen (muted YouTube) ---- */
-  const liveOK = !reduce && matchMedia('(pointer:fine)').matches && innerWidth > 900 && !(navigator.connection && navigator.connection.saveData);
+  const liveOK = !reduce && !(navigator.connection && navigator.connection.saveData);
   const live = $('#scr-live'), screenEl = $('#screen');
   let liveTimer = null;
   if (live && !$('.scr-live-tag')) screenEl.insertAdjacentHTML('beforeend', '<span class="scr-live-tag"><i></i>LIVE PREVIEW</span>');
