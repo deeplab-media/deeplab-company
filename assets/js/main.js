@@ -481,32 +481,48 @@
   const live = $('#scr-live'), screenEl = $('#screen');
   let liveTimer = null;
   if (live && !$('.scr-live-tag')) screenEl.insertAdjacentHTML('beforeend', '<span class="scr-live-tag"><i></i>LIVE PREVIEW</span>');
-  // the preview loads ahead of time and waits paused at its start (hold); it plays the moment the screen is in view
-  const cmd = (f, args = []) => live && live.firstChild && live.firstChild.contentWindow.postMessage(JSON.stringify({ event: 'command', func: f, args }), '*');
-  const reveal = ms => { clearTimeout(liveTimer); liveTimer = setTimeout(() => { live.classList.add('on'); screenEl.classList.add('is-live'); }, ms); };
+  // two players: the front one is on screen, the back one preloads the film that plays next, paused at its start (hold), so every switch is instant
+  let front = live, back = null;
+  if (live) { back = live.cloneNode(false); back.removeAttribute('id'); live.after(back); }
+  const send = (box, f, args = []) => box && box.firstChild && box.firstChild.contentWindow.postMessage(JSON.stringify({ event: 'command', func: f, args }), '*');
+  const startOf = id => +(($(`.rt[data-yt="${id}"]`) || { dataset: {} }).dataset.start || 12);
+  const clear = box => { if (!box) return; box.classList.remove('on'); box.innerHTML = ''; ['id', 'hold', 'primed'].forEach(k => delete box.dataset[k]); };
+  const load = (box, id, hold) => {
+    clear(box); box.dataset.id = id; box.dataset.start = startOf(id); if (hold) box.dataset.hold = 1;
+    box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&enablejsapi=1&start=${box.dataset.start}" title="Xem trước phim" allow="autoplay; encrypted-media" tabindex="-1"></iframe>`;
+    const f = box.firstChild; f.addEventListener('load', () => f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1, channel: 'widget' }), '*'), { once: true });
+  };
+  const go = box => { delete box.dataset.hold; if (box.dataset.primed) send(box, 'playVideo'); };
+  const show = (box, ms) => {
+    clearTimeout(liveTimer);
+    liveTimer = setTimeout(() => {
+      if (box !== front) return;
+      box.classList.add('on'); screenEl.classList.add('is-live');
+      const old = back; if (old.firstChild) setTimeout(() => old !== front && clear(old), 300);
+      const nx = window.__deeplabNextId && window.__deeplabNextId(); if (nx) setTimeout(() => window.__deeplabPreload(nx), 700);
+    }, ms);
+  };
   window.__deeplabLive = (id, hold) => {
     if (!liveOK || !live) return;
-    if (live.dataset.id === id && live.firstChild) { if (!hold && live.dataset.hold) { delete live.dataset.hold; live.dataset.primed ? cmd('playVideo') : 0; } return; }
-    clearTimeout(liveTimer); live.classList.remove('on'); screenEl.classList.remove('is-live');
-    const st = ($(`.rt[data-yt="${id}"]`) || { dataset: {} }).dataset.start || 12;
-    live.dataset.id = id; live.dataset.start = st; delete live.dataset.primed;
-    if (hold) live.dataset.hold = 1; else delete live.dataset.hold;
-    live.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&enablejsapi=1&start=${st}" title="Xem trước phim" allow="autoplay; encrypted-media" tabindex="-1"></iframe>`;
-    const f = live.firstChild;
-    f.addEventListener('load', () => f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1, channel: 'widget' }), '*'), { once: true });
+    if (front.dataset.id === id && front.firstChild) { if (!hold && front.dataset.hold) go(front); return; }
+    clearTimeout(liveTimer);
+    if (back.dataset.id === id && back.firstChild) { [front, back] = [back, front]; if (!hold) go(front); return; }  // old front stays up until the new one shows
+    screenEl.classList.remove('is-live'); clear(back); load(front, id, hold);
   };
+  window.__deeplabPreload = id => { if (!liveOK || !live || !id || front.dataset.id === id || back.dataset.id === id) return; load(back, id, true); };
   addEventListener('message', e => {
-    if (!live || !/^https:\/\/www\.youtube(-nocookie)?\.com$/.test(e.origin) || !live.firstChild || e.source !== live.firstChild.contentWindow) return;
+    if (!live || !/^https:\/\/www\.youtube(-nocookie)?\.com$/.test(e.origin)) return;
+    const box = [front, back].find(x => x && x.firstChild && e.source === x.firstChild.contentWindow); if (!box) return;
     let d; try { d = JSON.parse(e.data); } catch (_) { return; }
     const ps = d.event === 'onStateChange' ? d.info : d.info && d.info.playerState;
     if (ps === 1) {
-      if (live.dataset.hold) { cmd('pauseVideo'); cmd('seekTo', [+live.dataset.start, true]); live.dataset.primed = 1; return; }
-      // a cold start flashes YouTube's own pause button, so it waits a little longer before showing
-      if (!live.classList.contains('on')) reveal(live.dataset.primed ? 350 : 2500);
+      if (box.dataset.hold) { send(box, 'pauseVideo'); send(box, 'seekTo', [+box.dataset.start, true]); box.dataset.primed = 1; return; }
+      // a cold start flashes YouTube's own pause button, so it waits longer before showing; a preloaded one shows at once
+      if (box === front && !box.classList.contains('on')) show(box, box.dataset.primed ? 150 : 2500);
     }
-    if (ps === 0 && !(window.__deeplabEnded && window.__deeplabEnded())) cmd('seekTo', [+live.dataset.start, true]);
+    if (ps === 0 && box === front && !(window.__deeplabEnded && window.__deeplabEnded())) send(box, 'seekTo', [+box.dataset.start, true]);
   });
-  window.__deeplabLiveStop = () => { clearTimeout(liveTimer); if (live) { live.classList.remove('on'); live.innerHTML = ''; delete live.dataset.id; delete live.dataset.hold; delete live.dataset.primed; } screenEl && screenEl.classList.remove('is-live'); };
+  window.__deeplabLiveStop = () => { clearTimeout(liveTimer); clear(front); clear(back); screenEl && screenEl.classList.remove('is-live'); };
 
   /* ---- v9: lights down + screen zooms out from full-bleed ---- */
   if (hasGsap && !reduce && $('.cinema')) {
@@ -570,6 +586,7 @@
     // data-next on a tile: that film plays right after it (then the normal order resumes)
     const step = d => { const v = vis(); if (!v.length) return; v.forEach(t => { const n = t.dataset.next && v.find(x => x.dataset.yt === t.dataset.next); if (n) { v.splice(v.indexOf(n), 1); v.splice(v.indexOf(t) + 1, 0, n); } }); const k = v.indexOf(tiles[cur]); select(tiles.indexOf(v[(k + d + v.length) % v.length])); };
     const len = () => (liveOK && tiles[cur] && +tiles[cur].dataset.dur) || DUR;  // a tile may run its whole preview
+    window.__deeplabNextId = () => inView && tiles[cur] && tiles[cur].dataset.next;
     window.__deeplabEnded = () => { const t = tiles[cur]; if (!t || !t.dataset.next || !inView) return false; step(1); return true; };
     const restart = () => {
       clearTimeout(timer); const t = tiles[cur]; if (t) { const bar = t.querySelector('.rt-bar'); bar.style.setProperty('--dur', len() + 'ms'); bar.replaceWith(bar.cloneNode(true)); }
@@ -584,7 +601,9 @@
     const home = () => { if (!touched && start >= 0 && cur !== start) select(start); };
     const warm = () => tiles[cur] && window.__deeplabLive(tiles[cur].dataset.yt, true);
     new IntersectionObserver(es => es.forEach(en => { const was = inView; inView = en.isIntersecting; if (inView) { home(); restart(); tiles[cur] && window.__deeplabLive(tiles[cur].dataset.yt); } else if (was) { clearTimeout(timer); window.__deeplabLiveStop(); home(); warm(); } }), { threshold: .35 }).observe(stage);
-    new IntersectionObserver(([en]) => { if (inView) return; if (en.isIntersecting) { home(); warm(); } else window.__deeplabLiveStop(); }, { rootMargin: '1000px 0px' }).observe(stage);
+    new IntersectionObserver(([en]) => { if (inView) return; if (en.isIntersecting) { home(); warm(); } else window.__deeplabLiveStop(); }, { rootMargin: '2700px 0px' }).observe(stage);
+    // a visitor who starts scrolling is likely headed here: get the first film ready (never on load, so page speed is untouched)
+    addEventListener('scroll', () => { if (!inView) { home(); warm(); } }, { once: true, passive: true });
     addEventListener('keydown', e => { if (!inView || $('#modal').classList.contains('is-open')) return; if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); });
     $$('.cin-tabs button').forEach(b => b.addEventListener('click', () => {
       $$('.cin-tabs button').forEach(x => x.classList.toggle('is-active', x === b));
