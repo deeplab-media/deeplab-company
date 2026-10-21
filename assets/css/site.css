@@ -2536,31 +2536,50 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 .band[data-cat="new"] .band-side h3::after{content:"2026";margin-left:10px;padding:2px 8px;border-radius:99px;font-size:.62em;letter-spacing:.08em;vertical-align:middle;color:#060b24;background:var(--k4)}
 
 /* ================= v60: vertical product films + BTS photo strip ================= */
-.pvx{margin-top:clamp(56px,7vw,96px)}
-.pv-head{align-items:end}
-.pv-head h3{font-family:var(--f-display);font-stretch:125%;font-weight:900;font-size:clamp(1.8rem,3.4vw,3rem);line-height:1;letter-spacing:-.03em;color:var(--white);margin:0;text-wrap:balance}
-.pv-head h3 em{font-style:normal;font-family:var(--f-body);font-weight:400;font-stretch:100%;color:var(--k5)}
-.pv-row{display:grid;grid-auto-flow:column;grid-auto-columns:clamp(150px,15vw,210px);gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 18px;margin-top:24px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
-.pv-c{position:relative;aspect-ratio:9/16;border-radius:16px;overflow:hidden;padding:0;border:1px solid rgba(255,255,255,.1);background:#0a1030;cursor:pointer;scroll-snap-align:start;text-align:left;transition:transform .4s var(--ease-out),border-color .3s}
-.pv-c:hover,.pv-c:focus-visible{transform:translateY(-4px);border-color:var(--k5)}
-.pv-c video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.pv-c::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(4,8,29,.9))}
-.pv-m{position:absolute;left:12px;right:12px;bottom:12px;z-index:1;display:grid;gap:2px}
-.pv-m em{font-style:normal;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--k5)}
-.pv-m b{font-size:.92rem;line-height:1.25;color:var(--white)}
-.pv-m small{font-family:var(--f-num);font-size:.72rem;color:rgba(255,255,255,.65)}
-.pv-p{position:absolute;top:10px;right:10px;z-index:1;width:34px;height:34px;border-radius:50%;background:rgba(4,8,29,.55);backdrop-filter:blur(6px)}
-.pv-p::before{content:"";position:absolute;left:13px;top:10px;border-left:11px solid #fff;border-block:7px solid transparent}
-.pv-c[data-clip*="look"] .pv-m em{color:var(--k3)}
 .modal-box.is-clip{width:auto;height:min(86vh,900px);aspect-ratio:9/16;max-width:100%}
 .modal-box.is-clip video{width:100%;height:100%;object-fit:contain;background:#000}
 
-.bp{margin-block:clamp(48px,6vw,80px) clamp(24px,3vw,40px)}
-.bp-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 24px;margin-bottom:18px}
-.bp-h .fine{margin:0;max-width:52ch}
-.bp-row{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:14px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
-.bp-i{flex:none;height:clamp(200px,22vw,300px);padding:0;border:0;border-radius:12px;overflow:hidden;background:#0a1030;cursor:zoom-in;scroll-snap-align:start}
-.bp-i img{height:100%;width:auto;display:block;object-fit:cover;filter:saturate(.85);transition:transform .6s var(--ease-out),filter .4s}
-.bp-i:hover img,.bp-i:focus-visible img{transform:scale(1.04);filter:none}
-@media(max-width:640px){.pv-row{grid-auto-columns:44%}.bp-i{height:180px}}
-.wrap.wrap.pvx,.wrap.bp{display:block}
+/* ================= v62: MeriA in the TikTok wall + BTS photo gallery ================= */
+.tw-m{padding:0;font:inherit;cursor:pointer;border-color:rgba(52,211,153,.45)}
+.tw-m .tw-v{color:var(--k5)}
+.tw-m .tw-v i{border-left-color:var(--k5)}
+.tw-m::after{content:"";position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:rgba(6,11,36,.7) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 7l9 5-9 5z' fill='%2334d399'/%3E%3C/svg%3E") center/14px no-repeat}
+.tw-m:hover{border-color:var(--k5);box-shadow:0 18px 40px rgba(0,0,0,.5),0 0 0 1px var(--k5)}
+
+.bp{margin-block:clamp(56px,7vw,110px) clamp(40px,5vw,72px);position:relative}
+.bp-hero{position:relative;margin:0 0 clamp(14px,1.6vw,22px);height:clamp(420px,62vh,720px);overflow:hidden;isolation:isolate}
+.bp-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.08);transition:transform 2.4s cubic-bezier(.2,.7,.2,1)}
+.bp.is-in .bp-hero img{transform:scale(1)}
+.bp-hero::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(4,8,29,.88) 0%,rgba(4,8,29,.45) 45%,transparent 75%),linear-gradient(transparent 55%,#04081d)}
+.bp-hero::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;box-shadow:inset 0 clamp(26px,4vw,56px) 0 #000,inset 0 calc(-1 * clamp(26px,4vw,56px)) 0 #000;opacity:.85}
+.bp-hero figcaption{position:absolute;inset:auto 0 clamp(64px,9vw,120px);z-index:2;display:grid;gap:16px;justify-items:start}
+.bp-hero h2{font-family:var(--f-display);font-stretch:125%;font-weight:900;font-size:clamp(2.6rem,6.5vw,6.2rem);line-height:.95;letter-spacing:-.035em;color:var(--white);margin:0;max-width:12ch;text-wrap:balance}
+.bp-hero h2 em{display:block;font-style:normal;font-family:var(--f-body);font-weight:400;font-stretch:100%;color:var(--k4)}
+.bp-hero figcaption>p:not(.label){margin:0;max-width:46ch;font-size:clamp(1rem,1.3vw,1.15rem);line-height:1.6;color:rgba(255,255,255,.82)}
+.bp-rec{position:absolute;z-index:2;top:calc(clamp(26px,4vw,56px) + 14px);right:max(16px,var(--gutter,24px));display:flex;align-items:center;gap:8px;font-family:var(--f-num);font-size:.72rem;letter-spacing:.18em;color:#fff}
+.bp-rec i{width:9px;height:9px;border-radius:50%;background:#ff3b5c;animation:bprec 1.2s steps(2) infinite}
+@keyframes bprec{50%{opacity:0}}
+.bp-grid{columns:4 260px;column-gap:clamp(8px,.9vw,14px);padding-inline:max(16px,calc(var(--gutter,24px) * .6));max-height:clamp(900px,120vw,1500px);overflow:hidden;position:relative;transition:max-height 1s ease}
+.bp-grid::after{content:"";position:absolute;inset:auto 0 0;height:240px;background:linear-gradient(transparent,#04081d);pointer-events:none;transition:opacity .4s}
+.bp.open .bp-grid{max-height:none}
+.bp.open .bp-grid::after{opacity:0}
+.bp-i{position:relative;display:block;width:100%;margin:0 0 clamp(8px,.9vw,14px);padding:0;border:0;border-radius:10px;overflow:hidden;background:#0a1030;cursor:zoom-in;break-inside:avoid}
+.bp-i img{display:block;width:100%;height:auto;transition:transform .8s cubic-bezier(.2,.7,.2,1),filter .5s}
+.bp-i:hover img,.bp-i:focus-visible img{transform:scale(1.06)}
+.bp-grid:hover .bp-i:not(:hover) img{filter:brightness(.55) saturate(.7)}
+.bp-cap{position:absolute;inset:auto 0 0;padding:28px 14px 12px;display:flex;gap:10px;align-items:baseline;font-size:.84rem;line-height:1.35;color:#fff;text-align:left;background:linear-gradient(transparent,rgba(4,8,29,.92));transform:translateY(100%);transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+.bp-cap em{font-style:normal;font-family:var(--f-num);font-size:.7rem;letter-spacing:.1em;color:var(--k4)}
+.bp-i:hover .bp-cap,.bp-i:focus-visible .bp-cap{transform:none}
+.js .bp-i{opacity:0;transform:translateY(28px)}
+.js .bp-i.in{opacity:1;transform:none;transition:opacity .7s,transform .9s cubic-bezier(.2,.7,.2,1)}
+.bp-more-w{display:grid;place-items:center;margin-top:-20px;position:relative;z-index:1}
+.bp.open .bp-more-w{display:none}
+.bp-more{padding:14px 26px;border-radius:999px;border:1px solid var(--k4);background:rgba(251,191,36,.1);color:var(--white);font:600 .95rem var(--f-body);cursor:pointer;transition:background .3s,transform .3s}
+.bp-more:hover{background:rgba(251,191,36,.22);transform:translateY(-2px)}
+.modal-nav{display:none;position:fixed;top:50%;z-index:3;width:52px;height:52px;margin-top:-26px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(4,8,29,.7);color:#fff;font-size:1.3rem;cursor:pointer}
+.modal-nav.prev{left:max(12px,env(safe-area-inset-left,0px))}
+.modal-nav.next{right:max(12px,env(safe-area-inset-right,0px))}
+.modal.is-gal .modal-nav{display:grid;place-items:center}
+@media(max-width:640px){.bp-grid{columns:2;max-height:1100px}.bp-hero{height:78vh}.bp-cap{transform:none;font-size:.72rem;padding:20px 10px 8px}}
+@media(hover:none){.bp-cap{transform:none}}
+@media(prefers-reduced-motion:reduce){.js .bp-i{opacity:1;transform:none}.bp-hero img{transform:none}}

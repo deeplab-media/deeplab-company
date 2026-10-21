@@ -583,14 +583,21 @@
   const openBox = () => { modal.hidden = false; requestAnimationFrame(() => modal.classList.add('is-open')); lenis && lenis.stop(); $('#modal-close').focus(); };
   function openVideo(id) { box.classList.remove('is-img', 'is-clip'); box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1" title="Video Deeplab Media" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`; openBox(); }
   const openImg = src => { box.classList.remove('is-clip'); box.classList.add('is-img'); box.innerHTML = `<img src="${src}" alt="">`; openBox(); };
-  const closeBox = () => { modal.classList.remove('is-open'); lenis && lenis.start(); setTimeout(() => { box.innerHTML = ''; modal.hidden = true; }, 350); };
+  const closeBox = () => { modal.classList.remove('is-open', 'is-gal'); gi = -1; lenis && lenis.start(); setTimeout(() => { box.innerHTML = ''; modal.hidden = true; }, 350); };
   $$('.work[data-yt]').forEach(el => el.addEventListener('click', () => openVideo(el.dataset.yt)));
   $$('[data-img]').forEach(el => el.addEventListener('click', () => openImg(el.dataset.img)));
   // v60: vertical product films play from the site itself, with sound and controls (user tap, so the in-app guard skips them)
   const openClip = src => { box.classList.remove('is-img'); box.classList.add('is-clip'); box.innerHTML = `<video src="${src}" controls playsinline preload="auto"></video>`; openBox(); if (!noAuto) box.querySelector('video').play().catch(() => {}); };
   $$('[data-clip]').forEach(el => el.addEventListener('click', () => openClip(el.dataset.clip)));
-  const pvio = new IntersectionObserver(es => es.forEach(en => { const v = en.target; if (en.isIntersecting) { if (!v.src) v.src = v.dataset.src; play(v).then(() => v.classList.add('on')).catch(() => {}); } else v.pause(); }), { threshold: .4 });
-  if (!reduce) $$('.pv-c video').forEach(v => pvio.observe(v));
+  // v62: BTS gallery — reveal on scroll, expand, arrow through photos in the lightbox
+  const gal = $$('.bp-i'); let gi = -1;
+  const gio = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add(en.target.classList.contains('bp') ? 'is-in' : 'in'); gio.unobserve(en.target); } }), { threshold: .15 });
+  gal.forEach((el, i) => { el.style.transitionDelay = (i % 4) * 80 + 'ms'; gio.observe(el); el.addEventListener('click', () => { gi = i; modal.classList.add('is-gal'); }); });
+  $('#bp') && gio.observe($('#bp'));
+  $('#bp-more')?.addEventListener('click', e => { $('#bp').classList.add('open'); e.currentTarget.setAttribute('aria-expanded', 'true'); window.ScrollTrigger && ScrollTrigger.refresh(); });
+  const galGo = d => { if (gi < 0) return; gi = (gi + d + gal.length) % gal.length; const im = box.querySelector('img'); if (im) { im.src = gal[gi].dataset.img; im.alt = gal[gi].querySelector('img').alt; } };
+  $('#modal-prev')?.addEventListener('click', () => galGo(-1)); $('#modal-next')?.addEventListener('click', () => galGo(1));
+  addEventListener('keydown', e => { if (!modal.classList.contains('is-gal') || modal.hidden) return; if (e.key === 'ArrowLeft') galGo(-1); if (e.key === 'ArrowRight') galGo(1); });
   $('#modal-close').addEventListener('click', closeBox);
   modal.addEventListener('click', e => { if (e.target === modal) closeBox(); });
   addEventListener('keydown', e => { if (e.key === 'Escape') { closeBox(); closeMenu(); } });
