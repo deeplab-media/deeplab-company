@@ -175,3 +175,8 @@ section.blk{padding-block:clamp(36px,6vw,64px);border-top:1px solid var(--line)}
 .dz-alt{color:#0b5bd3;font-weight:700;text-decoration:none}
 @media(max-width:640px){.dl-chat{right:12px;bottom:12px}.dock-main{height:52px;padding:0 18px 0 14px;font-size:.9rem}.dock-btn{width:46px;height:46px}.dc-panel{width:calc(100vw - 24px);max-height:calc(100vh - 96px)}}
 @media(prefers-reduced-motion:reduce){.dock-main::before{animation:none}}
+
+/* v80 */
+.dock-main::before{animation:none;box-shadow:none;border:2px solid rgba(79,195,247,.7);animation:ringout 2.2s ease-out infinite}
+@keyframes ringout{from{transform:scale(1);opacity:.9}to{transform:scale(1.35);opacity:0}}
+.dl-chat.open .dock-main::before{animation:none;opacity:0}

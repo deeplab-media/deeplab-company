@@ -2932,3 +2932,23 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 /* ================= v78: insight cards = quote + one line ================= */
 .ins .ins-do{border-top:0;padding-top:0;margin:0;font-size:1.02rem;font-weight:600;color:var(--white)}
 .ins h3{margin-bottom:6px}
+
+/* ================= v80: performance — looping effects move with transform/opacity only (no per-frame repaint) ================= */
+.h2-zalo{animation:none;box-shadow:0 12px 34px rgba(0,104,255,.55)}
+.orb-core{animation:none;box-shadow:0 0 0 6px rgba(79,195,247,.18),0 12px 40px rgba(79,195,247,.55)}
+.orb-core::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(79,195,247,.7);animation:ringout 2.4s ease-out infinite;pointer-events:none}
+.dock-main::before{animation:none;box-shadow:none;border:2px solid rgba(79,195,247,.7);animation:ringout 2.2s ease-out infinite}
+@keyframes ringout{from{transform:scale(1);opacity:.9}to{transform:scale(1.35);opacity:0}}
+.dl-chat.open .dock-main::before{animation:none;opacity:0}
+.card-vis::after{top:0;animation:scan2 6s linear infinite;will-change:transform}
+@keyframes scan2{from{transform:translateY(-100%)}to{transform:translateY(250%)}}
+.ed-ph{left:34px;right:10px;width:auto;background:none;box-shadow:none;animation:edph2 7s linear infinite}
+.ed-ph::after{content:"";position:absolute;right:0;top:0;bottom:0;width:2px;background:#ff3b5c;box-shadow:0 0 10px #ff3b5c}
+@keyframes edph2{from{transform:translateX(-100%)}to{transform:none}}
+.bf{will-change:transform}
+@media(prefers-reduced-motion:reduce){.orb-core::after,.dock-main::before,.card-vis::after,.ed-ph{animation:none}}
+/* the spinning conic border repainted all six big cards every frame: hold it still, spin only under a mouse */
+#cards .card{animation:none;--ang:210deg}
+@media(hover:hover) and (pointer:fine){#cards .card:hover{animation:spin-border 9s linear infinite}}
+.ad-set i{animation:none}
+#wf:not(.in) .wf-disc{animation-play-state:paused}

@@ -9,7 +9,10 @@
   // v79: in-app browsers try inline autoplay too; if one still forces a video fullscreen, the guards below close it and stop autoplay for the visit
   let noAuto = false;
   const stopAll = () => document.querySelectorAll('video').forEach(v => v.pause());
-  const play = v => noAuto ? Promise.reject(new Error('inline playback unavailable')) : HTMLMediaElement.prototype.play.call(v);
+  const play = v => { if (v.dataset.poster && !v.poster) v.poster = v.dataset.poster; return noAuto ? Promise.reject(new Error('inline playback unavailable')) : HTMLMediaElement.prototype.play.call(v); };
+  // v80: video posters load only when near the screen (they used to download all 50+ on open)
+  const pio = 'IntersectionObserver' in window && new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { const v = en.target; v.poster = v.dataset.poster; pio.unobserve(v); } }), { rootMargin: '900px 0px' });
+  addEventListener('DOMContentLoaded', () => document.querySelectorAll('video[data-poster]').forEach(v => pio ? pio.observe(v) : (v.poster = v.dataset.poster)));
   document.addEventListener('webkitbeginfullscreen', e => { const v = e.target; if (v.controls) return; noAuto = true; if (v.webkitExitFullscreen) v.webkitExitFullscreen(); stopAll(); }, true);
   document.addEventListener('fullscreenchange', () => { const f = document.fullscreenElement; if (f && f.tagName === 'VIDEO' && !f.controls) { noAuto = true; document.exitFullscreen().catch(() => {}); stopAll(); } });
   const hasGsap = !!window.gsap;
@@ -18,7 +21,8 @@
 
   /* ---- Lenis ---- */
   let lenis = null;
-  if (!reduce && window.Lenis) {
+  // touch screens scroll natively (smooth already); Lenis there only adds per-frame work
+  if (!reduce && window.Lenis && matchMedia('(pointer:fine)').matches) {
     lenis = new Lenis({ lerp: 0.09 });
     if (hasGsap) { lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0); }
     else { const raf = t => { lenis.raf(t); requestAnimationFrame(raf); }; requestAnimationFrame(raf); }
@@ -367,8 +371,9 @@
     // v73: a refresh while scrolling un-pins the pinned sections for a frame (the flicker). Render everything once, early, then stop re-measuring.
     let settled = false;
     const settle = () => { if (settled) return; settled = true; document.documentElement.classList.add('cv-off'); requestAnimationFrame(() => setTimeout(() => { ro.disconnect(); clearTimeout(rt); ScrollTrigger.refresh(); }, 120)); };
-    addEventListener('scroll', settle, { once: true, passive: true });
-    addEventListener('load', () => setTimeout(() => ('requestIdleCallback' in window ? requestIdleCallback(settle, { timeout: 3000 }) : settle()), 6000));
+    // only wide screens have pinned sections; phones keep lazy rendering (it costs them seconds of layout)
+    if (innerWidth > 1000) addEventListener('scroll', settle, { once: true, passive: true });
+    if (innerWidth > 1000) addEventListener('load', () => setTimeout(() => ('requestIdleCallback' in window ? requestIdleCallback(settle, { timeout: 3000 }) : settle()), 6000));
   }
 
   /* ---- count-up + reveal ---- */
@@ -619,7 +624,8 @@
     rail.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; down = true; sx = e.clientX; sl = rail.scrollLeft; rail.dataset.moved = '0'; });
     addEventListener('pointermove', e => { if (!down) return; const dx = e.clientX - sx; if (Math.abs(dx) > 5) { rail.dataset.moved = '1'; rail.classList.add('drag'); } rail.scrollLeft = sl - dx; });
     addEventListener('pointerup', () => { if (!down) return; down = false; rail.classList.remove('drag'); setTimeout(() => rail.dataset.moved = '0', 0); });
-    tiles.forEach(t => t.querySelector('.rt-img').style.setProperty('--bg', 'url(../img/yt/' + t.dataset.yt + '-s.webp)'));
+    // tile backdrops load only when the rail is near the screen
+    new IntersectionObserver(([en], ob) => { if (!en.isIntersecting) return; ob.disconnect(); tiles.forEach(t => t.querySelector('.rt-img').style.setProperty('--bg', 'url(../img/yt/' + t.dataset.yt + '-s.webp)')); }, { rootMargin: '900px 0px' }).observe(rail);
     const start = tiles.findIndex(t => t.dataset.yt === $('#scr-play').dataset.yt);
     select(start < 0 ? 0 : start);
   }
