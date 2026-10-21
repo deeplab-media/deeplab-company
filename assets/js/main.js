@@ -620,6 +620,16 @@
     select(start < 0 ? 0 : start);
   }
 
+  /* ---- v69: ads card — MeriA hooks play only while visible; frames switch 9:16 <-> 4:5 ---- */
+  const ads = $('.vis-ads2');
+  if (ads) {
+    const vids = $$('video', ads); let rt = null;
+    new IntersectionObserver(([en]) => {
+      if (en.isIntersecting) { vids.forEach(v => { if (!v.src) v.src = v.dataset.src; reduce || play(v).catch(() => {}); }); if (!reduce && !rt) rt = setInterval(() => { ads.dataset.r = ads.dataset.r === '916' ? '45' : '916'; }, 2600); }
+      else { vids.forEach(v => v.pause()); clearInterval(rt); rt = null; }
+    }, { threshold: .3 }).observe(ads);
+  }
+
   /* ---- v68: VFX before/after — drag (or hover with a mouse); sweeps once on arrival to show it moves ---- */
   const vx = $('#vx-cmp');
   if (vx) {
