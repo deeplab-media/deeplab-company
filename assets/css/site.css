@@ -2904,3 +2904,27 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 .dz-alt{color:#0b5bd3;font-weight:700;text-decoration:none}
 @media(max-width:640px){.dl-chat{right:12px;bottom:12px}.dock-main{height:52px;padding:0 18px 0 14px;font-size:.9rem}.dock-btn{width:46px;height:46px}.dc-panel{width:calc(100vw - 24px);max-height:calc(100vh - 96px)}}
 @media(prefers-reduced-motion:reduce){.hc-track,.h2-zalo,.orb-core,.dock-main::before{animation:none}}
+
+/* ================= v77: intro — Vietnam-Japan chip, two cards, big blurred flags drifting behind ================= */
+.desc2{position:relative;overflow:hidden;isolation:isolate}
+.d2-flags{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.bf{position:absolute;display:block;width:clamp(320px,38vw,620px);aspect-ratio:3/2;filter:blur(10px) saturate(1.05);opacity:.26;border-radius:24px;overflow:hidden}
+.bf svg{display:block;width:100%;height:100%}
+.bf-vn{left:-8%;top:4%;transform:rotate(-8deg);animation:bfa 22s ease-in-out infinite}
+.bf-jp{right:-6%;left:auto;top:30%;opacity:.3;transform:rotate(7deg);animation:bfb 26s ease-in-out infinite}
+@keyframes bfa{50%{transform:translate(40px,30px) rotate(-4deg)}}
+@keyframes bfb{50%{transform:translate(-50px,-34px) rotate(10deg)}}
+.d2-labels{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.d2-jv{margin:0;display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);font-family:var(--f-num);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff}
+.fl{display:inline-block;width:22px;height:15px;border-radius:3px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.25);flex:none}
+.fl svg{display:block;width:100%;height:100%}
+.d2-jv .fl+.fl{margin-left:-4px}
+.d2-jvl{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;max-width:560px}
+.d2-jvl li{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"f b" "f s";gap:2px 12px;align-items:center;padding:14px 16px;border-radius:14px;background:rgba(10,20,64,.55);border:1px solid rgba(166,227,251,.14);backdrop-filter:blur(6px)}
+.d2-jvl .fl{grid-area:f;width:34px;height:23px;border-radius:4px}
+.d2-jvl b{grid-area:b;font-size:1rem;color:#fff}
+.d2-jvl b[lang="ja"]{font-family:"Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif}
+.d2-jvl small{grid-area:s;font-size:.8rem;line-height:1.4;color:var(--muted)}
+@media(max-width:640px){.d2-jvl{grid-template-columns:1fr}.bf{width:80vw;filter:blur(8px)}.bf-jp{right:-20%;top:auto;bottom:4%}}
+.d2-labels>*{margin:0}
+@media(prefers-reduced-motion:reduce){.bf-vn,.bf-jp{animation:none}}
