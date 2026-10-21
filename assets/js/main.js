@@ -556,8 +556,9 @@
       el.addEventListener('pointerenter', () => { label.textContent = el.id === 'screen' ? 'PLAY' : 'CHỌN'; pc.classList.add('on'); });
       el.addEventListener('pointerleave', () => pc.classList.remove('on'));
     });
-    $('#screen').addEventListener('click', e => { if (!e.target.closest('.scr-play')) $('#scr-play').click(); });
   }
+  // v83: the whole screen opens the film on every device (it used to live inside the mouse-only block above)
+  $('#screen') && $('#screen').addEventListener('click', e => { if (!e.target.closest('.scr-play')) $('#scr-play').click(); });
 
   /* ---- v9: hover loops (drop assets/video/loops/<id>.mp4 and list the ids in assets/video/media.json) ---- */
   const media = fetch('assets/video/media.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
@@ -703,7 +704,8 @@
   /* ---- modal: youtube + image ---- */
   const modal = $('#modal'), box = $('#modal-box');
   const openBox = () => { modal.hidden = false; requestAnimationFrame(() => modal.classList.add('is-open')); lenis && lenis.stop(); $('#modal-close').focus(); };
-  function openVideo(id) { const st = ($(`.rt[data-yt="${id}"]`) || { dataset: {} }).dataset.start; box.classList.remove('is-img', 'is-clip'); box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1${st ? '&start=' + st : ''}" title="Video Deeplab Media" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`; openBox(); }
+  function openVideo(id) { const st = ($(`.rt[data-yt="${id}"]`) || { dataset: {} }).dataset.start;
+    if (inApp) { location.href = 'https://www.youtube.com/watch?v=' + id + (st ? '&t=' + st + 's' : ''); return; } box.classList.remove('is-img', 'is-clip'); box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1${st ? '&start=' + st : ''}" title="Video Deeplab Media" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`; openBox(); }
   const openImg = src => { box.classList.remove('is-clip'); box.classList.add('is-img'); box.innerHTML = `<img src="${src}" alt="">`; openBox(); };
   const closeBox = () => { modal.classList.remove('is-open', 'is-gal'); gi = -1; lenis && lenis.start(); setTimeout(() => { box.innerHTML = ''; modal.hidden = true; }, 350); };
   $$('.work[data-yt]').forEach(el => el.addEventListener('click', () => openVideo(el.dataset.yt)));

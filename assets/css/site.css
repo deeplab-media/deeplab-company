@@ -2960,3 +2960,19 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 
 /* ================= v82: phones render the middle sections lazily too (pins are desktop-only) ================= */
 @media(max-width:1000px){#why,#services,#cgi,#vfx{content-visibility:auto;contain-intrinsic-size:auto 1600px}}
+
+/* ================= v83: iPhone fixes — ambient glow stays small, tidy eyebrow, visible play pill on touch ================= */
+/* a 70px blur over the whole (8000px+) screening room broke Safari's filter limits and painted an empty beige block */
+.cin-amb{bottom:auto;height:min(140vh,1400px);-webkit-mask-image:linear-gradient(#000 60%,transparent);mask-image:linear-gradient(#000 60%,transparent)}
+@media(max-width:700px){.cin-amb img{filter:blur(40px) saturate(1.4) brightness(.55)}}
+@media(max-width:700px){
+  .h2-eyebrow{flex-wrap:wrap;gap:8px 10px;padding-right:0;font-size:.64rem;letter-spacing:.12em;line-height:1.3}
+  .eb-long{display:none}
+  .h2-eyebrow .h2-clock{flex-basis:100%;width:max-content;flex-grow:0;margin:2px 0 0;justify-self:start}
+}
+@media(hover:none){
+  .scr-play{display:flex;left:12px;top:auto;bottom:12px;transform:none;flex-direction:row;align-items:center;gap:8px;padding:8px 14px 8px 8px;border-radius:999px;background:rgba(4,8,29,.72);backdrop-filter:blur(6px);font-size:.7rem;letter-spacing:.12em}
+  .scr-play span{width:30px;height:30px}
+  .scr-play span::before{border-left-width:10px;border-top-width:6px;border-bottom-width:6px;margin-left:3px}
+  .scr-play span::after{display:none}
+}
