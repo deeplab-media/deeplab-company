@@ -2952,3 +2952,8 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 @media(hover:hover) and (pointer:fine){#cards .card:hover{animation:spin-border 9s linear infinite}}
 .ad-set i{animation:none}
 #wf:not(.in) .wf-disc{animation-play-state:paused}
+
+/* ================= v81: in-app browsers — stills move instead of video (no fullscreen) ================= */
+.inapp #screen>img.on{animation:kbz 14s ease-in-out infinite alternate}
+@keyframes kbz{from{transform:scale(1)}to{transform:scale(1.12) translate(-2%,-1%)}}
+@media(prefers-reduced-motion:reduce){.inapp #screen>img.on{animation:none}}

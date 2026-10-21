@@ -6,8 +6,11 @@
   /* v56: inline-only video. iOS in-app browsers ignore playsinline, so they get posters instead of autoplay;
      any clip that still opens fullscreen by itself is closed and autoplay stops for the visit */
   const ua = navigator.userAgent;
-  // v79: in-app browsers try inline autoplay too; if one still forces a video fullscreen, the guards below close it and stop autoplay for the visit
-  let noAuto = false;
+  // v81: in-app browsers (Zalo, Facebook, Messenger, TikTok… on iOS and Android) open any playing <video> fullscreen, and Android gives the page no event to undo it.
+  // So there: no video autoplay at all; the hero runs as an animated WebP and the screening room as slow zooms on stills.
+  const inApp = /FBAN|FBAV|FB_IAB|FB4A|FBIOS|Messenger|Instagram|Zalo|Line\/|musical_ly|BytedanceWebview|TikTok|; wv\)/i.test(ua);
+  if (inApp) document.documentElement.classList.add('inapp');
+  let noAuto = inApp;
   const stopAll = () => document.querySelectorAll('video').forEach(v => v.pause());
   const play = v => { if (v.dataset.poster && !v.poster) v.poster = v.dataset.poster; return noAuto ? Promise.reject(new Error('inline playback unavailable')) : HTMLMediaElement.prototype.play.call(v); };
   // v80: video posters load only when near the screen (they used to download all 50+ on open)
@@ -260,7 +263,10 @@
 
   /* ---- v29: hero = self-hosted Dior loop (autoplay in markup). Respect reduced motion / data saver; pause off-screen ---- */
   const hvid = $('.h2-vid');
-  if (hvid) {
+  if (hvid && inApp) {
+    const still = $('.hs-f'); hvid.remove();
+    if (still && !reduce) addEventListener('load', () => { const a = new Image(); a.onload = () => { still.removeAttribute('srcset'); still.src = a.src; }; a.src = 'assets/img/hero-dior-anim.webp'; }, { once: true });
+  } else if (hvid) {
     // poster paints first (LCP); the loop is attached after load so it never competes with the page
     const lite = reduce || (navigator.connection && navigator.connection.saveData);
     const attach = () => { if (hvid.src || lite || noAuto) return; hvid.src = innerWidth < 900 ? hvid.dataset.srcM : hvid.dataset.src; hvid.preload = 'auto'; };
@@ -486,7 +492,7 @@
   swBtn && swBtn.addEventListener('click', () => { const on = swBtn.getAttribute('aria-pressed') !== 'true'; swBtn.setAttribute('aria-pressed', String(on)); $('#screen').classList.toggle('wire-hold', on); });
 
   /* ---- v9: live screen (muted YouTube) ---- */
-  const liveOK = !reduce && !(navigator.connection && navigator.connection.saveData);
+  const liveOK = !reduce && !inApp && !(navigator.connection && navigator.connection.saveData);
   const live = $('#scr-live'), screenEl = $('#screen');
   let liveTimer = null;
   if (live && !$('.scr-live-tag')) screenEl.insertAdjacentHTML('beforeend', '<span class="scr-live-tag"><i></i>LIVE PREVIEW</span>');
