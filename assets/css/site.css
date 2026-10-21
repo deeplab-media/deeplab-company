@@ -2809,3 +2809,13 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 .ws-panel.on{visibility:visible;opacity:1;pointer-events:auto}
 /* once the page is idle (or the visitor starts scrolling) lower sections render for good, so their height stops changing mid-scroll */
 .cv-off :is(#insight,#work,#results,#bts,#about,#contact){content-visibility:visible}
+
+/* ================= v74: softer giant numerals + 'Tặng kèm' chips ================= */
+#cards .card::before{filter:blur(3px);opacity:.7}
+.card-text .gift{display:grid;gap:8px;padding:12px 14px;border-radius:12px;background:linear-gradient(120deg,rgba(251,191,36,.12),rgba(251,191,36,.03));border:1px dashed rgba(251,191,36,.5)}
+.gift-h{margin:0;display:flex;align-items:center;gap:8px;font-family:var(--f-num);font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#fbbf24}
+.gift-h::before{content:"";width:16px;height:16px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fbbf24' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='8' width='18' height='4' rx='1'/%3E%3Cpath d='M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5'/%3E%3C/svg%3E") center/contain no-repeat}
+.card-text .gift ul{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.card-text .gift li{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:.8rem;color:var(--white);background:rgba(6,11,36,.5);border:1px solid rgba(251,191,36,.3)}
+.card-text .gift li::before{content:"+";font-weight:800;color:#fbbf24}
+@media(max-width:800px){.card-text .gift li{font-size:.76rem}}
