@@ -274,7 +274,7 @@
     if (deck) {
       const cards = $$('.d2-clip', deck), n = cards.length;
       let order = cards.map((_, i) => i), seen = false, t = null, busy = false;
-      const paint = () => cards.forEach((c, i) => { const p = order.indexOf(i), v = $('video', c); c.style.setProperty('--p', p); c.classList.toggle('top', p === 0); if (p <= 1 && seen && !v.src) v.src = v.dataset.src; if (p === 0 && seen && !reduce) play(v).catch(() => {}); else v.pause(); });
+      const paint = () => cards.forEach((c, i) => { const p = order.indexOf(i), v = $('video', c); c.style.setProperty('--p', p); c.classList.toggle('top', p === 0); c.classList.toggle('far', p > 3); if (p <= 1 && seen && !v.src) v.src = v.dataset.src; if (p === 0 && seen && !reduce) play(v).catch(() => {}); else v.pause(); });
       const next = () => {
         if (busy) return; busy = true;
         const top = cards[order[0]]; top.classList.add('lift');

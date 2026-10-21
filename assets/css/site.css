@@ -2583,3 +2583,6 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 @media(max-width:640px){.bp-grid{columns:2;max-height:1100px}.bp-hero{height:78vh}.bp-cap{transform:none;font-size:.72rem;padding:20px 10px 8px}}
 @media(hover:none){.bp-cap{transform:none}}
 @media(prefers-reduced-motion:reduce){.js .bp-i{opacity:1;transform:none}.bp-hero img{transform:none}}
+
+/* ================= v63: deck shows the front four clips ================= */
+.d2-deck .d2-clip.far{opacity:0;pointer-events:none}
