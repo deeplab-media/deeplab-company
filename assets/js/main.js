@@ -620,6 +620,27 @@
     select(start < 0 ? 0 : start);
   }
 
+  /* ---- v71: card 01 feed swipes, card 02 output plays, card 06 grid fills post by post — only while visible ---- */
+  const whileSeen = (el, on, off) => el && new IntersectionObserver(([en]) => en.isIntersecting ? on() : off(), { threshold: .3 }).observe(el);
+  const feed = $('.tt-feed');
+  if (feed && !reduce) {
+    const n = feed.children.length - 1; let i = 0, t = null;
+    const next = () => { i++; feed.style.transform = `translateY(${-i * 100}%)`; if (i === n) setTimeout(() => { feed.classList.add('snap'); i = 0; feed.style.transform = 'translateY(0)'; void feed.offsetWidth; feed.classList.remove('snap'); }, 800); };
+    whileSeen(feed, () => { t = t || setInterval(next, 2200); }, () => { clearInterval(t); t = null; });
+  }
+  const edv = $('.ed-phone video');
+  whileSeen(edv, () => { if (!edv.src) edv.src = edv.dataset.src; reduce || play(edv).catch(() => {}); }, () => edv.pause());
+  const fg = $('.fg-grid');
+  if (fg) {
+    const tiles = $$('img', fg), plan = $$('.fplan li'); let i = 0, hold = 0, t = null;
+    const step = () => {  // place one post at a time; hold the full grid ~2.6s, then start over
+      if (i < tiles.length) { tiles[i].classList.add('in'); plan.forEach((p, k) => p.classList.toggle('on', k === i % plan.length)); i++; }
+      else if (++hold > 4) { tiles.forEach(x => x.classList.remove('in')); plan.forEach(p => p.classList.remove('on')); i = hold = 0; }
+    };
+    if (reduce) tiles.forEach(x => x.classList.add('in'));
+    else whileSeen(fg, () => { t = t || setInterval(step, 650); }, () => { clearInterval(t); t = null; });
+  }
+
   /* ---- v70: card 04 on-set monitor — BTS photos cycle with a running timecode while visible ---- */
   const setMon = $('.set-mon');
   if (setMon) {
