@@ -2782,3 +2782,21 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 .fplan li b{display:block;font-family:var(--f-num);font-size:.56rem;color:var(--k6)}
 .fplan li.on{background:rgba(251,122,90,.16);border-color:var(--k6);color:#fff}
 @media(prefers-reduced-motion:reduce){.ed-ph{animation:none}.fg-grid img{opacity:1;transform:none}}
+
+/* ================= v72: cards say what they solve + what's included; best-seller band on 03/04 ================= */
+.card-text .solve{margin:0;max-width:34ch;font-size:clamp(1.05rem,1.45vw,1.32rem);line-height:1.4;font-weight:600;color:var(--white)}
+.card-text .solve span{display:block;margin-bottom:6px;font-family:var(--f-num);font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--c,var(--accent))}
+.card-text .incl-h{margin:4px 0 -4px;font-family:var(--f-num);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.card-text ul.incl{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin:0;padding:0;list-style:none;font-size:.93rem;color:var(--white)}
+.card-text ul.incl li{display:flex;align-items:flex-start;gap:10px;line-height:1.35}
+.card-text ul.incl li::before{content:"";flex:none;width:19px;height:19px;margin-top:1px;border-radius:50%;background:var(--c,var(--k1)) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%2304081d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px no-repeat}
+.card-text .cta-row{margin-top:auto}
+@media(max-width:800px){.card-text ul.incl{grid-template-columns:1fr;gap:9px}.card-text .solve{font-size:1.05rem}}
+
+#cards .card.best{padding-top:calc(clamp(22px,3vw,40px) + 34px);box-shadow:0 -14px 34px rgba(0,0,0,.5),0 0 0 1.5px #fbbf24,0 0 46px rgba(251,191,36,.2)}
+.best-band{position:absolute;top:0;left:0;right:0;z-index:3;height:34px;display:flex;align-items:center;overflow:hidden;color:#1a1200;background:#fbbf24 repeating-linear-gradient(-45deg,rgba(255,255,255,.22) 0 10px,transparent 10px 20px)}
+.bb-track{display:flex;gap:30px;padding-left:24px;white-space:nowrap;font-family:var(--f-num);font-size:.74rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;animation:bbm 24s linear infinite}
+.bb-track span:nth-child(even){font-weight:600;letter-spacing:.1em;opacity:.78}
+@keyframes bbm{to{transform:translateX(-50%)}}
+.sx-tag.best{background:#fbbf24;color:#1a1200;border-color:#fbbf24}
+@media(prefers-reduced-motion:reduce){.bb-track{animation:none}}

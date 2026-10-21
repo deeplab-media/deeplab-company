@@ -293,11 +293,6 @@
   }
 
 
-  /* ---- v32: phone service cards show a summary; details open on demand ---- */
-  $$('.cd-more').forEach(b => b.addEventListener('click', () => {
-    const c = b.closest('.card'), open = c.classList.toggle('open');
-    b.setAttribute('aria-expanded', String(open)); b.textContent = open ? 'Thu gọn' : 'Xem chi tiết';
-  }));
 
 
   /* ---- v44: why — swipe engine on the vector phone + scroll-driven stepper ---- */
