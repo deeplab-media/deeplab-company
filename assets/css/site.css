@@ -2586,3 +2586,6 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 
 /* ================= v63: deck shows the front four clips ================= */
 .d2-deck .d2-clip.far{opacity:0;pointer-events:none}
+
+/* ================= v64: no play button on the screening screen (click the screen to watch) ================= */
+.scr-play{display:none}

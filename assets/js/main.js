@@ -483,10 +483,21 @@
     if (!liveOK || !live) return;
     clearTimeout(liveTimer); live.classList.remove('on'); screenEl.classList.remove('is-live');
     liveTimer = setTimeout(() => {
-      live.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&start=12" title="Xem trước phim" allow="autoplay; encrypted-media" tabindex="-1"></iframe>`;
-      live.querySelector('iframe').addEventListener('load', () => setTimeout(() => { live.classList.add('on'); screenEl.classList.add('is-live'); }, 1800), { once: true });
+      const st = ($(`.rt[data-yt="${id}"]`) || { dataset: {} }).dataset.start || 12;
+      live.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&enablejsapi=1&start=${st}" title="Xem trước phim" allow="autoplay; encrypted-media" tabindex="-1"></iframe>`;
+      // show the preview only once YouTube reports it is playing, so its own play/skip overlay never appears on the screen
+      const f = live.querySelector('iframe'); live.dataset.start = st; delete live.dataset.shown;
+      f.addEventListener('load', () => f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1, channel: 'widget' }), '*'), { once: true });
     }, 1200);
   };
+  addEventListener('message', e => {
+    if (!live || !/^https:\/\/www\.youtube(-nocookie)?\.com$/.test(e.origin) || !live.firstChild || e.source !== live.firstChild.contentWindow) return;
+    let d; try { d = JSON.parse(e.data); } catch (_) { return; }
+    const ps = d.event === 'onStateChange' ? d.info : d.info && d.info.playerState;
+    // YouTube flashes its own pause button when playback starts: reveal a few seconds later; loop by seeking back (no playlist = no skip buttons)
+    if (ps === 1 && !live.dataset.shown) { live.dataset.shown = 1; liveTimer = setTimeout(() => { live.classList.add('on'); screenEl.classList.add('is-live'); }, 3500); }
+    if (ps === 0 && !(window.__deeplabEnded && window.__deeplabEnded())) e.source.postMessage(JSON.stringify({ event: 'command', func: 'seekTo', args: [+(live.dataset.start || 12), true] }), '*');
+  });
   window.__deeplabLiveStop = () => { clearTimeout(liveTimer); if (live) { live.classList.remove('on'); live.innerHTML = ''; } screenEl && screenEl.classList.remove('is-live'); };
 
   /* ---- v9: lights down + screen zooms out from full-bleed ---- */
@@ -547,10 +558,13 @@
       window.__deeplabLive && (inView ? window.__deeplabLive(t.dataset.yt) : window.__deeplabLiveStop());
       restart();
     };
-    const step = d => { const v = vis(); if (!v.length) return; const k = v.indexOf(tiles[cur]); select(tiles.indexOf(v[(k + d + v.length) % v.length])); };
+    // data-next on a tile: that film plays right after it (then the normal order resumes)
+    const step = d => { const v = vis(); if (!v.length) return; v.forEach(t => { const n = t.dataset.next && v.find(x => x.dataset.yt === t.dataset.next); if (n) { v.splice(v.indexOf(n), 1); v.splice(v.indexOf(t) + 1, 0, n); } }); const k = v.indexOf(tiles[cur]); select(tiles.indexOf(v[(k + d + v.length) % v.length])); };
+    const len = () => (liveOK && tiles[cur] && +tiles[cur].dataset.dur) || DUR;  // a tile may run its whole preview
+    window.__deeplabEnded = () => { const t = tiles[cur]; if (!t || !t.dataset.next || paused || !inView) return false; step(1); return true; };
     const restart = () => {
-      clearTimeout(timer); const t = tiles[cur]; if (t) { const bar = t.querySelector('.rt-bar'); bar.style.setProperty('--dur', DUR + 'ms'); bar.replaceWith(bar.cloneNode(true)); }
-      if (!reduce && inView && !paused) timer = setTimeout(() => step(1), DUR);
+      clearTimeout(timer); const t = tiles[cur]; if (t) { const bar = t.querySelector('.rt-bar'); bar.style.setProperty('--dur', len() + 'ms'); bar.replaceWith(bar.cloneNode(true)); }
+      if (!reduce && inView && !paused) timer = setTimeout(() => step(1), len());
     };
     tiles.forEach((t, i) => t.addEventListener('click', () => { if (rail.dataset.moved === '1') return; select(i, true); }));
     $('#sl-prev')?.addEventListener('click', () => step(-1)); $('#sl-next')?.addEventListener('click', () => step(1));
@@ -581,7 +595,7 @@
   /* ---- modal: youtube + image ---- */
   const modal = $('#modal'), box = $('#modal-box');
   const openBox = () => { modal.hidden = false; requestAnimationFrame(() => modal.classList.add('is-open')); lenis && lenis.stop(); $('#modal-close').focus(); };
-  function openVideo(id) { box.classList.remove('is-img', 'is-clip'); box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1" title="Video Deeplab Media" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`; openBox(); }
+  function openVideo(id) { const st = ($(`.rt[data-yt="${id}"]`) || { dataset: {} }).dataset.start; box.classList.remove('is-img', 'is-clip'); box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1${st ? '&start=' + st : ''}" title="Video Deeplab Media" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`; openBox(); }
   const openImg = src => { box.classList.remove('is-clip'); box.classList.add('is-img'); box.innerHTML = `<img src="${src}" alt="">`; openBox(); };
   const closeBox = () => { modal.classList.remove('is-open', 'is-gal'); gi = -1; lenis && lenis.start(); setTimeout(() => { box.innerHTML = ''; modal.hidden = true; }, 350); };
   $$('.work[data-yt]').forEach(el => el.addEventListener('click', () => openVideo(el.dataset.yt)));
