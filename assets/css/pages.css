@@ -112,3 +112,66 @@ section.blk{padding-block:clamp(36px,6vw,64px);border-top:1px solid var(--line)}
 .pgf b{color:var(--white);font-size:.9rem}
 @media(max-width:860px){.pgf{grid-template-columns:repeat(2,minmax(0,1fr))}.pgb-cap{display:none}}
 @media(max-width:560px){.pg-band{height:260px}.pgb-cta .btn{padding:11px 16px;font-size:.82rem}}
+
+/* contact dock */
+.dl-chat{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:max(18px,env(safe-area-inset-bottom,0px));z-index:95;display:grid;justify-items:end;gap:12px;font-family:var(--f-body)}
+.dl-chat [hidden]{display:none!important}
+.dc-dock{display:flex;align-items:center;gap:10px}
+.dock-btn{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:.68rem;font-weight:800;text-decoration:none;box-shadow:0 10px 26px rgba(0,0,0,.4);transition:transform .3s}
+.dock-btn:hover{transform:translateY(-3px)}
+.d-zalo{background:#0068ff}
+.d-msg{background:linear-gradient(135deg,#00b2ff,#7a3cff 60%,#ff4f8b)}
+.d-msg svg{width:26px;height:26px}
+.d-msg svg path{fill:#fff}
+.d-msg svg path.f{fill:#5b4dff}
+.dock-main{position:relative;display:flex;align-items:center;gap:10px;height:58px;padding:0 24px 0 18px;border:0;border-radius:999px;background:var(--accent);color:#04081d;font:800 .98rem var(--f-body);cursor:pointer;box-shadow:0 14px 36px rgba(79,195,247,.5);transition:transform .3s}
+.dock-main:hover{transform:translateY(-2px)}
+.dock-main::before{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 0 0 rgba(79,195,247,.6);animation:dockping 2.2s ease-out infinite}
+@keyframes dockping{to{box-shadow:0 0 0 16px rgba(79,195,247,0)}}
+.dock-main svg{width:22px;height:22px;fill:none;stroke:#04081d;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.dl-chat.open .dock-main::before{animation:none}
+.dc-teaser{position:relative;display:grid;gap:2px;max-width:250px;padding:12px 32px 12px 14px;border-radius:16px 16px 4px 16px;background:#fff;color:#04081d;font-size:.84rem;line-height:1.4;box-shadow:0 18px 40px rgba(0,0,0,.4);cursor:pointer;animation:dcin .45s cubic-bezier(.2,.7,.2,1)}
+.dc-teaser b{font-size:.94rem}
+.dc-x{position:absolute;top:4px;right:6px;width:24px;height:24px;border:0;background:none;color:#5a6080;font-size:1.1rem;cursor:pointer}
+@keyframes dcin{from{opacity:0;transform:translateY(10px) scale(.96)}}
+.dc-panel{display:flex;flex-direction:column;width:min(370px,calc(100vw - 36px));max-height:min(640px,calc(100vh - 110px));overflow:hidden;border-radius:20px;background:#0a1440;border:1px solid rgba(166,227,251,.2);box-shadow:0 30px 90px rgba(0,0,0,.65);animation:dcin .35s cubic-bezier(.2,.7,.2,1)}
+.dc-panel header{display:flex;align-items:center;gap:10px;padding:14px 14px 12px;background:linear-gradient(120deg,#16297a,#0d1a52)}
+.dc-panel header img{width:34px;height:34px;padding:6px;border-radius:50%;background:rgba(255,255,255,.08)}
+.dc-panel header div{display:grid;flex:1}
+.dc-panel header b{color:#fff;font-size:.95rem}
+.dc-panel header small{display:flex;align-items:center;gap:6px;font-size:.72rem;color:rgba(255,255,255,.7)}
+.dc-panel header small i{width:7px;height:7px;border-radius:50%;background:#2ee59d}
+.dc-close{width:30px;height:30px;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#fff;font-size:1.1rem;cursor:pointer}
+.dc-log{flex:1;min-height:140px;overflow-y:auto;display:grid;align-content:start;gap:9px;padding:14px;overscroll-behavior:contain}
+.dc-log .m{max-width:86%;padding:10px 13px;border-radius:15px;font-size:.87rem;line-height:1.5;animation:dcin .3s ease}
+.dc-log .m.bot{justify-self:start;background:#17246a;color:#e8eefc;border-bottom-left-radius:4px}
+.dc-log .m.me{justify-self:end;background:var(--accent);color:#04081d;border-bottom-right-radius:4px}
+.dc-log .m a{color:var(--accent);font-weight:700}
+.dc-log .m b{color:#fff}
+.dc-log .typing{display:flex;gap:4px;padding:12px 14px}
+.dc-log .typing i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.6);animation:dcdot 1s infinite}
+.dc-log .typing i:nth-child(2){animation-delay:.15s}.dc-log .typing i:nth-child(3){animation-delay:.3s}
+@keyframes dcdot{50%{opacity:.2;transform:translateY(-3px)}}
+.dc-quick{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px}
+.dc-quick button{padding:7px 11px;border-radius:999px;border:1px solid rgba(79,195,247,.5);background:rgba(79,195,247,.06);color:#fff;font:600 .78rem var(--f-body);cursor:pointer;transition:background .25s}
+.dc-quick button:hover{background:rgba(79,195,247,.2)}
+.dc-ask{display:flex;gap:6px;padding:10px 14px;border-top:1px solid rgba(166,227,251,.12)}
+.dc-ask input{flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid rgba(166,227,251,.2);background:#060b24;color:#fff;font:inherit;font-size:.86rem}
+.dc-ask button{width:40px;border:0;border-radius:10px;background:var(--accent);color:#04081d;font-weight:800;cursor:pointer}
+.dc-ch{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:0 14px 14px}
+.dc-ch a{padding:10px 6px;border-radius:10px;text-align:center;text-decoration:none;font-size:.8rem;font-weight:800;color:#fff}
+.ch-zalo{background:#0068ff}
+.ch-msg{background:linear-gradient(135deg,#00b2ff,#7a3cff 60%,#ff4f8b)}
+.ch-mail{border:1px solid rgba(166,227,251,.3)}
+.dc-zalo{display:grid;gap:10px;margin:0 14px 10px;padding:12px;border-radius:14px;background:#fff;color:#04081d;font-size:.8rem;line-height:1.45}
+.dc-zalo p{margin:0}
+.dc-zalo p b{display:block;font-size:.92rem}
+.dz-row{display:flex;align-items:center;gap:12px}
+.dz-row img{width:112px;height:112px;flex:none;border-radius:8px;border:1px solid #e3e7f3}
+.dz-row div{display:grid;gap:7px}
+.dz-row span{font-weight:700}
+.dz-btn{display:block;padding:8px 10px;border-radius:8px;background:#0068ff;color:#fff;text-align:center;text-decoration:none;font-weight:700}
+.dz-copy{padding:7px 10px;border-radius:8px;border:1px solid #c9d2ea;background:#fff;color:#04081d;font:600 .76rem var(--f-body);cursor:pointer}
+.dz-alt{color:#0b5bd3;font-weight:700;text-decoration:none}
+@media(max-width:640px){.dl-chat{right:12px;bottom:12px}.dock-main{height:52px;padding:0 18px 0 14px;font-size:.9rem}.dock-btn{width:46px;height:46px}.dc-panel{width:calc(100vw - 24px);max-height:calc(100vh - 96px)}}
+@media(prefers-reduced-motion:reduce){.dock-main::before{animation:none}}
