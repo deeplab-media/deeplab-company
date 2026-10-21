@@ -620,6 +620,19 @@
     select(start < 0 ? 0 : start);
   }
 
+  /* ---- v68: VFX before/after — drag (or hover with a mouse); sweeps once on arrival to show it moves ---- */
+  const vx = $('#vx-cmp');
+  if (vx) {
+    const r = $('.vx-range', vx), set = v => { vx.style.setProperty('--pos', v + '%'); r.value = v; };
+    r.addEventListener('input', () => { vx.dataset.touched = 1; set(r.value); });
+    vx.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; vx.dataset.touched = 1; const b = vx.getBoundingClientRect(); set(Math.max(0, Math.min(100, (e.clientX - b.left) / b.width * 100))); });
+    if (!reduce) new IntersectionObserver(([en], ob) => {
+      if (!en.isIntersecting) return; ob.disconnect();
+      let t0 = null; const run = now => { if (vx.dataset.touched) return; t0 ??= now; const k = Math.min(1, (now - t0) / 3200); set(50 + Math.sin(k * Math.PI * 2) * 40 * (1 - k)); if (k < 1) requestAnimationFrame(run); };
+      setTimeout(() => requestAnimationFrame(run), 400);
+    }, { threshold: .55 }).observe(vx);
+  }
+
   /* ---- colour-grade before/after slider ---- */
   $$('.grade').forEach(g => { const r = $('.g-range', g); const set = () => g.style.setProperty('--pos', r.value + '%'); r.addEventListener('input', set); set(); });
 
