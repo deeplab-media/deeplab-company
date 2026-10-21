@@ -9,8 +9,8 @@
   let noAuto = /iPhone|iPad|iPod/.test(ua) && /FBAN|FBAV|FB_IAB|Messenger|Instagram|Zalo|Line\/|musical_ly|BytedanceWebview|TikTok/i.test(ua);
   const stopAll = () => document.querySelectorAll('video').forEach(v => v.pause());
   const play = v => noAuto ? Promise.reject(new Error('inline playback unavailable')) : HTMLMediaElement.prototype.play.call(v);
-  document.addEventListener('webkitbeginfullscreen', e => { const v = e.target; noAuto = true; if (v.webkitExitFullscreen) v.webkitExitFullscreen(); stopAll(); }, true);
-  document.addEventListener('fullscreenchange', () => { const f = document.fullscreenElement; if (f && f.tagName === 'VIDEO') { noAuto = true; document.exitFullscreen().catch(() => {}); stopAll(); } });
+  document.addEventListener('webkitbeginfullscreen', e => { const v = e.target; if (v.controls) return; noAuto = true; if (v.webkitExitFullscreen) v.webkitExitFullscreen(); stopAll(); }, true);
+  document.addEventListener('fullscreenchange', () => { const f = document.fullscreenElement; if (f && f.tagName === 'VIDEO' && !f.controls) { noAuto = true; document.exitFullscreen().catch(() => {}); stopAll(); } });
   const hasGsap = !!window.gsap;
   if (hasGsap) gsap.registerPlugin(ScrollTrigger);
   const W = () => innerWidth, Hh = () => innerHeight;
@@ -581,11 +581,16 @@
   /* ---- modal: youtube + image ---- */
   const modal = $('#modal'), box = $('#modal-box');
   const openBox = () => { modal.hidden = false; requestAnimationFrame(() => modal.classList.add('is-open')); lenis && lenis.stop(); $('#modal-close').focus(); };
-  function openVideo(id) { box.classList.remove('is-img'); box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1" title="Video Deeplab Media" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`; openBox(); }
-  const openImg = src => { box.classList.add('is-img'); box.innerHTML = `<img src="${src}" alt="">`; openBox(); };
+  function openVideo(id) { box.classList.remove('is-img', 'is-clip'); box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1" title="Video Deeplab Media" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`; openBox(); }
+  const openImg = src => { box.classList.remove('is-clip'); box.classList.add('is-img'); box.innerHTML = `<img src="${src}" alt="">`; openBox(); };
   const closeBox = () => { modal.classList.remove('is-open'); lenis && lenis.start(); setTimeout(() => { box.innerHTML = ''; modal.hidden = true; }, 350); };
   $$('.work[data-yt]').forEach(el => el.addEventListener('click', () => openVideo(el.dataset.yt)));
   $$('[data-img]').forEach(el => el.addEventListener('click', () => openImg(el.dataset.img)));
+  // v60: vertical product films play from the site itself, with sound and controls (user tap, so the in-app guard skips them)
+  const openClip = src => { box.classList.remove('is-img'); box.classList.add('is-clip'); box.innerHTML = `<video src="${src}" controls playsinline preload="auto"></video>`; openBox(); if (!noAuto) box.querySelector('video').play().catch(() => {}); };
+  $$('[data-clip]').forEach(el => el.addEventListener('click', () => openClip(el.dataset.clip)));
+  const pvio = new IntersectionObserver(es => es.forEach(en => { const v = en.target; if (en.isIntersecting) { if (!v.src) v.src = v.dataset.src; play(v).then(() => v.classList.add('on')).catch(() => {}); } else v.pause(); }), { threshold: .4 });
+  if (!reduce) $$('.pv-c video').forEach(v => pvio.observe(v));
   $('#modal-close').addEventListener('click', closeBox);
   modal.addEventListener('click', e => { if (e.target === modal) closeBox(); });
   addEventListener('keydown', e => { if (e.key === 'Escape') { closeBox(); closeMenu(); } });
