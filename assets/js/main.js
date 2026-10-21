@@ -371,15 +371,19 @@
 
   /* ---- v52: lower sections render lazily (content-visibility); re-measure triggers once their real height is known ---- */
   if (hasGsap && 'ResizeObserver' in window) {
-    let rt = null;
-    const ro = new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => ScrollTrigger.refresh(), 250); });
-    ['#why', '#services', '#cgi', '#vfx', '#insight', '#work', '#results', '#bts', '#about', '#contact'].forEach(id => { const el = $(id); el && ro.observe(el); });
-    // v73: a refresh while scrolling un-pins the pinned sections for a frame (the flicker). Render everything once, early, then stop re-measuring.
+    // re-measure whenever the page height changes (lazy sections render, images arrive), but only once scrolling has
+    // stopped for a moment: a refresh mid-scroll un-pins the pinned sections for a frame (the flicker seen before)
+    let rt = null, lastScroll = 0, lastH = 0;
+    const refresh = () => { ScrollTrigger.sort(); ScrollTrigger.refresh(); };
+    const later = () => { clearTimeout(rt); rt = setTimeout(() => (performance.now() - lastScroll < 300 ? later() : refresh()), 320); };
+    addEventListener('scroll', () => { lastScroll = performance.now(); }, { passive: true });
+    new ResizeObserver(() => { const h = document.documentElement.scrollHeight; if (Math.abs(h - lastH) > 2) { lastH = h; later(); } }).observe(document.querySelector('main') || document.body);
+    // wide screens (the only ones with pinned sections) render every section once, early, so heights settle fast
     let settled = false;
-    const settle = () => { if (settled) return; settled = true; document.documentElement.classList.add('cv-off'); requestAnimationFrame(() => setTimeout(() => { ro.disconnect(); clearTimeout(rt); ScrollTrigger.refresh(); }, 120)); };
-    // only wide screens have pinned sections; phones keep lazy rendering (it costs them seconds of layout)
+    // re-measure right away unless the reader is inside a pinned section (that is the only time a refresh shows)
+    const settle = () => { if (settled) return; settled = true; document.documentElement.classList.add('cv-off'); requestAnimationFrame(() => (ScrollTrigger.getAll().some(t => t.pin && t.isActive) ? later() : refresh())); };
     if (innerWidth > 1000) addEventListener('scroll', settle, { once: true, passive: true });
-    if (innerWidth > 1000) addEventListener('load', () => setTimeout(() => ('requestIdleCallback' in window ? requestIdleCallback(settle, { timeout: 3000 }) : settle()), 6000));
+    if (innerWidth > 1000) addEventListener('load', () => setTimeout(() => ('requestIdleCallback' in window ? requestIdleCallback(settle, { timeout: 1500 }) : settle()), 1200));
   }
 
   /* ---- count-up + reveal ---- */
@@ -738,5 +742,7 @@
   addEventListener('keydown', e => { if (e.key === 'Escape') { closeBox(); closeMenu(); } });
 
   $('#year').textContent = new Date().getFullYear();
-  addEventListener('load', () => window.ScrollTrigger && ScrollTrigger.refresh());
+  // triggers are created in code order, not page order; pinned sections (3D now sits above 'Ba việc') must be measured top-down
+  if (hasGsap) { ScrollTrigger.sort(); ScrollTrigger.refresh(); }
+  addEventListener('load', () => { if (window.ScrollTrigger) { ScrollTrigger.sort(); ScrollTrigger.refresh(); } });
 })();

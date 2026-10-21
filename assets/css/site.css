@@ -2980,3 +2980,8 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 /* v84: the still drifts slowly until the live preview takes over, so the screen never looks frozen */
 #screen:not(.is-live)>img.on{animation:kbz 14s ease-in-out infinite alternate}
 @media(prefers-reduced-motion:reduce){#screen>img.on{animation:none}}
+
+/* v85: images now carry width/height so the browser reserves their space; keep CSS-sized images in charge (zero specificity) */
+:where(img){height:auto}
+/* the count-up badge (x0 -> x944) widened while counting and pushed the channel name onto a second line */
+.ch-x{flex:none;min-width:4.6em;text-align:center;font-variant-numeric:tabular-nums}
