@@ -2,9 +2,68 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://deeplab-media.github.io/deeplab-company/</loc>
-    <lastmod>2026-10-20</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-10-21</lastmod>
     <priority>1.0</priority>
     <image:image><image:loc>https://deeplab-media.github.io/deeplab-company/assets/img/og-image.jpg</image:loc><image:title>Deeplab Media</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://deeplab-media.github.io/deeplab-company/dich-vu/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://deeplab-media.github.io/deeplab-company/dich-vu/tiktok-tron-goi/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://deeplab-media.github.io/deeplab-company/dich-vu/dung-video-ngan/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://deeplab-media.github.io/deeplab-company/dich-vu/hau-ky-white-label/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://deeplab-media.github.io/deeplab-company/dich-vu/quay-phim-tvc/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://deeplab-media.github.io/deeplab-company/dich-vu/video-quang-cao/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://deeplab-media.github.io/deeplab-company/dich-vu/thiet-ke-social/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://deeplab-media.github.io/deeplab-company/du-an/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://deeplab-media.github.io/deeplab-company/du-an/kenh-tiktok-ngoc-tiep-minato/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://deeplab-media.github.io/deeplab-company/du-an/kenh-tiktok-ngoc-tiep-sensei/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://deeplab-media.github.io/deeplab-company/du-an/kenh-tiktok-oo-cha-minato/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://deeplab-media.github.io/deeplab-company/hoi-dap/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <priority>0.8</priority>
   </url>
 </urlset>

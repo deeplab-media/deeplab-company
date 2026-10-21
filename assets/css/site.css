@@ -2475,3 +2475,10 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 .js:not(.fonts) .hero2 :is(.h2-title,.h2-bottom){visibility:hidden}
 /* v55: insight + films also render lazily; triggers re-measure via the v52 ResizeObserver */
 #insight,#work{content-visibility:auto;contain-intrinsic-size:auto 1400px}
+/* v57: links to the service pages */
+.card-page{display:inline-flex;align-items:center;margin-left:14px;font:700 .82rem/1 var(--f-body);color:var(--c,var(--accent));text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:3px}
+.card-page:hover{color:var(--white)}
+.ft3-map{display:flex;flex-wrap:wrap;gap:6px 18px;max-width:560px;font-size:.84rem}
+.ft3-map a{color:var(--text);text-decoration:none}
+.ft3-map a:hover{color:var(--white)}
+@media(max-width:700px){.card-page{margin:10px 0 0;display:inline-block}}
