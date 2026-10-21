@@ -2976,3 +2976,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   .scr-play span::before{border-left-width:10px;border-top-width:6px;border-bottom-width:6px;margin-left:3px}
   .scr-play span::after{display:none}
 }
+
+/* v84: the still drifts slowly until the live preview takes over, so the screen never looks frozen */
+#screen:not(.is-live)>img.on{animation:kbz 14s ease-in-out infinite alternate}
+@media(prefers-reduced-motion:reduce){#screen>img.on{animation:none}}

@@ -501,24 +501,29 @@
   if (live) { back = live.cloneNode(false); back.removeAttribute('id'); live.after(back); }
   const send = (box, f, args = []) => box && box.firstChild && box.firstChild.contentWindow.postMessage(JSON.stringify({ event: 'command', func: f, args }), '*');
   const startOf = id => +(($(`.rt[data-yt="${id}"]`) || { dataset: {} }).dataset.start || 12);
-  const clear = box => { if (!box) return; box.classList.remove('on'); box.innerHTML = ''; ['id', 'hold', 'primed'].forEach(k => delete box.dataset[k]); };
+  const clear = box => { if (!box) return; box.classList.remove('on'); box.innerHTML = ''; ['id', 'hold', 'primed', 'nextQueued', 't0', 'len'].forEach(k => delete box.dataset[k]); };
   const load = (box, id, hold) => {
     clear(box); box.dataset.id = id; box.dataset.start = startOf(id); if (hold) box.dataset.hold = 1;
     box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&enablejsapi=1&start=${box.dataset.start}" title="Xem trước phim" allow="autoplay; encrypted-media" tabindex="-1"></iframe>`;
     const f = box.firstChild; f.addEventListener('load', () => f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1, channel: 'widget' }), '*'), { once: true });
   };
-  const go = box => { delete box.dataset.hold; if (box.dataset.primed) send(box, 'playVideo'); };
+  // a preloaded player keeps running muted out of sight; arriving only rewinds it (a play command would make YouTube flash its pause icon)
+  // a preloaded player keeps running muted out of sight; arriving just reveals it. Any command (play, seek) makes YouTube flash its pause icon for ~2s.
+  // reveal only once a player has run ~2.3s: YouTube shows its own pause icon for the first seconds after any start or seek
+  // ...and for ~1.6s after the player scrolls into view
+  const ready = box => Math.max(120, 2300 - (performance.now() - (+box.dataset.t0 || performance.now())), 1600 - (performance.now() - (+screenEl.dataset.enter || 0)));
+  const go = box => { delete box.dataset.hold; if (box.dataset.primed && box === front) show(box, ready(box)); };
   const show = (box, ms) => {
     clearTimeout(liveTimer);
     liveTimer = setTimeout(() => {
       if (box !== front) return;
       box.classList.add('on'); screenEl.classList.add('is-live');
       const old = back; if (old.firstChild) setTimeout(() => old !== front && clear(old), 300);
-      const nx = window.__deeplabNextId && window.__deeplabNextId(); if (nx) setTimeout(() => window.__deeplabPreload(nx), 700);
     }, ms);
   };
   window.__deeplabLive = (id, hold) => {
     if (!liveOK || !live) return;
+    if (!hold) screenEl.dataset.enter = performance.now();
     if (front.dataset.id === id && front.firstChild) { if (!hold && front.dataset.hold) go(front); return; }
     clearTimeout(liveTimer);
     if (back.dataset.id === id && back.firstChild) { [front, back] = [back, front]; if (!hold) go(front); return; }  // old front stays up until the new one shows
@@ -530,12 +535,20 @@
     const box = [front, back].find(x => x && x.firstChild && e.source === x.firstChild.contentWindow); if (!box) return;
     let d; try { d = JSON.parse(e.data); } catch (_) { return; }
     const ps = d.event === 'onStateChange' ? d.info : d.info && d.info.playerState;
+    if (d.info && d.info.duration) box.dataset.len = d.info.duration;  // only some messages carry the duration
+    // start the next film quietly ~6s before this one ends, so the switch lands near its beginning
+    if (box === front && d.info && box.dataset.len && d.info.currentTime > box.dataset.len - 6 && !box.dataset.nextQueued) { const nx = window.__deeplabNextId && window.__deeplabNextId(); if (nx) { box.dataset.nextQueued = 1; window.__deeplabPreload(nx); } }
     if (ps === 1) {
-      if (box.dataset.hold) { send(box, 'pauseVideo'); send(box, 'seekTo', [+box.dataset.start, true]); box.dataset.primed = 1; return; }
+      if (!box.dataset.t0) box.dataset.t0 = performance.now();
+      if (box.dataset.hold) { box.dataset.primed = 1; return; }
       // a cold start flashes YouTube's own pause button, so it waits longer before showing; a preloaded one shows at once
-      if (box === front && !box.classList.contains('on')) show(box, box.dataset.primed ? 150 : 2500);
+      if (box === front && !box.classList.contains('on')) show(box, ready(box));
     }
-    if (ps === 0 && box === front && !(window.__deeplabEnded && window.__deeplabEnded())) send(box, 'seekTo', [+box.dataset.start, true]);
+    if (ps === 0 && box === front) {
+      // never leave YouTube's end screen (replay icon) on view: fall back to the still until the next film or the loop is ready
+      box.classList.remove('on'); screenEl.classList.remove('is-live');
+      if (!(window.__deeplabEnded && window.__deeplabEnded())) { send(box, 'seekTo', [+box.dataset.start, true]); box.dataset.t0 = performance.now(); show(box, 2300); }
+    }
   });
   window.__deeplabLiveStop = () => { clearTimeout(liveTimer); clear(front); clear(back); screenEl && screenEl.classList.remove('is-live'); };
 
@@ -617,9 +630,7 @@
     const home = () => { if (!touched && start >= 0 && cur !== start) select(start); };
     const warm = () => tiles[cur] && window.__deeplabLive(tiles[cur].dataset.yt, true);
     new IntersectionObserver(es => es.forEach(en => { const was = inView; inView = en.isIntersecting; if (inView) { home(); restart(); tiles[cur] && window.__deeplabLive(tiles[cur].dataset.yt); } else if (was) { clearTimeout(timer); window.__deeplabLiveStop(); home(); warm(); } }), { threshold: .35 }).observe(stage);
-    new IntersectionObserver(([en]) => { if (inView) return; if (en.isIntersecting) { home(); warm(); } else window.__deeplabLiveStop(); }, { rootMargin: '2700px 0px' }).observe(stage);
-    // a visitor who starts scrolling is likely headed here: get the first film ready (never on load, so page speed is untouched)
-    addEventListener('scroll', () => { if (!inView) { home(); warm(); } }, { once: true, passive: true });
+    new IntersectionObserver(([en]) => { if (inView) return; if (en.isIntersecting) { home(); warm(); } else window.__deeplabLiveStop(); }, { rootMargin: '1000px 0px' }).observe(stage);
     addEventListener('keydown', e => { if (!inView || $('#modal').classList.contains('is-open')) return; if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); });
     $$('.cin-tabs button').forEach(b => b.addEventListener('click', () => {
       $$('.cin-tabs button').forEach(x => x.classList.toggle('is-active', x === b));
