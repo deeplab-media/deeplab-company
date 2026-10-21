@@ -2592,3 +2592,17 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 
 /* ================= v65: no wireframe scan on the screening screen ================= */
 .scr-wire{display:none}
+
+/* ================= v66: multiview at the top of BTS — near full-bleed, 6 columns, bigger tiles ================= */
+.bts-wrap .mv{--mvw:min(96vw,1760px,140vh);width:var(--mvw);margin-inline:calc(50% - var(--mvw) / 2);padding:clamp(12px,1.3vw,22px);border-radius:26px;transform-origin:50% 100%}
+.mv-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(6px,.7vw,12px)}
+.mv-pgm,.mv-cam{border-radius:12px}
+.mv-pgm{grid-column:span 2;grid-row:span 2}
+.mv-bar{font-size:.76rem;padding:4px 6px 16px}
+.mv-tc{font-size:1rem}
+.mv-tag{left:10px;bottom:10px;font-size:.68rem;padding:4px 8px}
+.mv-tag.pgm{top:12px;left:12px;font-size:.78rem}
+.mv-now{left:12px;bottom:12px;font-size:.9rem;padding:6px 10px}
+.mv-pgm::after{font-size:1rem}
+@media(max-width:1000px){.mv-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.mv-cam:nth-child(n+10){display:block}}
+@media(max-width:700px){.bts-wrap .mv{--mvw:96vw}.mv-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}

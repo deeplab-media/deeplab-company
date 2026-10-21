@@ -205,11 +205,13 @@
         if (!reduce) { timer = timer || setInterval(tick, 4000); t0 = t0 || performance.now(); requestAnimationFrame(frame); }
       } else { vids.forEach(v => v.pause()); clearInterval(timer); timer = null; }
     }, { threshold: .25 }).observe($('.mv-grid', mv));
+    // v66: the console tips up from the floor as it scrolls in
+    if (hasGsap && !reduce) gsap.fromTo(mv, { rotateX: 24, scale: .86, y: 80, transformPerspective: 1600 }, { rotateX: 0, scale: 1, y: 0, ease: 'none', scrollTrigger: { trigger: mv, start: 'top 98%', end: 'top 30%', scrub: .6 } });
     const open = $('#mv-open'), all = $('#mv-all');
     const aio = new IntersectionObserver(es => es.forEach(en => { const v = en.target; if (en.isIntersecting) { load(v); reduce || play(v).catch(() => {}); } else v.pause(); }), { rootMargin: '100px' });
     open.addEventListener('click', () => {
       all.hidden = !all.hidden; open.setAttribute('aria-expanded', String(!all.hidden));
-      open.textContent = all.hidden ? 'Xem tất cả 37 clip' : 'Thu gọn';
+      open.textContent = all.hidden ? 'Xem tất cả ' + $$('video', all).length + ' clip' : 'Thu gọn';
       if (!all.hidden) $$('video', all).forEach(v => aio.observe(v)); else $$('video', all).forEach(v => { aio.unobserve(v); v.pause(); });
       window.ScrollTrigger && ScrollTrigger.refresh();
     });
