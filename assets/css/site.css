@@ -2928,3 +2928,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 @media(max-width:640px){.d2-jvl{grid-template-columns:1fr}.bf{width:80vw;filter:blur(8px)}.bf-jp{right:-20%;top:auto;bottom:4%}}
 .d2-labels>*{margin:0}
 @media(prefers-reduced-motion:reduce){.bf-vn,.bf-jp{animation:none}}
+
+/* ================= v78: insight cards = quote + one line ================= */
+.ins .ins-do{border-top:0;padding-top:0;margin:0;font-size:1.02rem;font-weight:600;color:var(--white)}
+.ins h3{margin-bottom:6px}
