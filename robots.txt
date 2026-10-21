@@ -11,4 +11,4 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://deeplab-media.github.io/deeplab-company/sitemap.xml
+Sitemap: https://media.deeplabassist.vn/sitemap.xml
