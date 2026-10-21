@@ -153,6 +153,7 @@
   const chio = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('is-in'); chio.unobserve(en.target); } }), { threshold: .35 });
   $$('.res2 .ch').forEach(c => chio.observe(c));
   $$('.cards-head.sx').forEach(c => chio.observe(c));
+  $$('#inv').forEach(c => chio.observe(c));
 
 
   /* ---- v17: BTS multiview — PGM cycles through cams, click to cut, play only in view ---- */
