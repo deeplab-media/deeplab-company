@@ -373,7 +373,7 @@
   if (hasGsap && 'ResizeObserver' in window) {
     let rt = null;
     const ro = new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => ScrollTrigger.refresh(), 250); });
-    ['#insight', '#work', '#results', '#bts', '#about', '#contact'].forEach(id => { const el = $(id); el && ro.observe(el); });
+    ['#why', '#services', '#cgi', '#vfx', '#insight', '#work', '#results', '#bts', '#about', '#contact'].forEach(id => { const el = $(id); el && ro.observe(el); });
     // v73: a refresh while scrolling un-pins the pinned sections for a frame (the flicker). Render everything once, early, then stop re-measuring.
     let settled = false;
     const settle = () => { if (settled) return; settled = true; document.documentElement.classList.add('cv-off'); requestAnimationFrame(() => setTimeout(() => { ro.disconnect(); clearTimeout(rt); ScrollTrigger.refresh(); }, 120)); };

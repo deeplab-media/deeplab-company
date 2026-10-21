@@ -2957,3 +2957,6 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 .inapp #screen>img.on{animation:kbz 14s ease-in-out infinite alternate}
 @keyframes kbz{from{transform:scale(1)}to{transform:scale(1.12) translate(-2%,-1%)}}
 @media(prefers-reduced-motion:reduce){.inapp #screen>img.on{animation:none}}
+
+/* ================= v82: phones render the middle sections lazily too (pins are desktop-only) ================= */
+@media(max-width:1000px){#why,#services,#cgi,#vfx{content-visibility:auto;contain-intrinsic-size:auto 1600px}}
