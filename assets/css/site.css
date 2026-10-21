@@ -2800,3 +2800,12 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 @keyframes bbm{to{transform:translateX(-50%)}}
 .sx-tag.best{background:#fbbf24;color:#1a1200;border-color:#fbbf24}
 @media(prefers-reduced-motion:reduce){.bb-track{animation:none}}
+
+/* ================= v73: fast-scroll fixes ================= */
+/* stepper: all three panels share one grid cell, so the pinned box keeps one height whichever step is showing */
+.ws-panels{display:grid}
+.ws-panel,.ws-panel.on{display:grid;grid-area:1/1;align-self:start}
+.ws-panel{visibility:hidden;opacity:0;pointer-events:none}
+.ws-panel.on{visibility:visible;opacity:1;pointer-events:auto}
+/* once the page is idle (or the visitor starts scrolling) lower sections render for good, so their height stops changing mid-scroll */
+.cv-off :is(#insight,#work,#results,#bts,#about,#contact){content-visibility:visible}
