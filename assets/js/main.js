@@ -3,6 +3,14 @@
   const $ = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => [...c.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* v56: inline-only video. iOS in-app browsers ignore playsinline, so they get posters instead of autoplay;
+     any clip that still opens fullscreen by itself is closed and autoplay stops for the visit */
+  const ua = navigator.userAgent;
+  let noAuto = /iPhone|iPad|iPod/.test(ua) && /FBAN|FBAV|FB_IAB|Messenger|Instagram|Zalo|Line\/|musical_ly|BytedanceWebview|TikTok/i.test(ua);
+  const stopAll = () => document.querySelectorAll('video').forEach(v => v.pause());
+  const play = v => noAuto ? Promise.reject(new Error('inline playback unavailable')) : HTMLMediaElement.prototype.play.call(v);
+  document.addEventListener('webkitbeginfullscreen', e => { const v = e.target; noAuto = true; if (v.webkitExitFullscreen) v.webkitExitFullscreen(); stopAll(); }, true);
+  document.addEventListener('fullscreenchange', () => { const f = document.fullscreenElement; if (f && f.tagName === 'VIDEO') { noAuto = true; document.exitFullscreen().catch(() => {}); stopAll(); } });
   const hasGsap = !!window.gsap;
   if (hasGsap) gsap.registerPlugin(ScrollTrigger);
   const W = () => innerWidth, Hh = () => innerHeight;
@@ -137,7 +145,7 @@
   const track = $('.reel-track');
   if (track) {
     track.innerHTML += track.innerHTML;
-    const vio = new IntersectionObserver(es => es.forEach(en => { const v = en.target; en.isIntersecting ? v.play().catch(() => {}) : v.pause(); }), { rootMargin: '150px' });
+    const vio = new IntersectionObserver(es => es.forEach(en => { const v = en.target; en.isIntersecting ? play(v).catch(() => {}) : v.pause(); }), { rootMargin: '150px' });
     $$('video', track).forEach(v => vio.observe(v));
   }
 
@@ -158,7 +166,7 @@
       cams.forEach((c, k) => { c.classList.toggle('is-pgm', k === cur); c.classList.toggle('is-pvw', k === (cur + 1) % cams.length); });
       pgm.src = cams[cur].dataset.src; now.textContent = 'CAM ' + cams[cur].dataset.cam;
       const fig = pgm.parentElement; fig.classList.remove('cut'); void fig.offsetWidth; fig.classList.add('cut');
-      if (live) pgm.play().catch(() => {});
+      if (live) play(pgm).catch(() => {});
     };
     const tick = () => { if (Date.now() < hold) return; cut(cur + 1); };
     const frame = () => { if (!live) return; const f = Math.floor((performance.now() - t0) / 40), p = n => String(n).padStart(2, '0'); tc.textContent = `${p(Math.floor(f / 90000))}:${p(Math.floor(f / 1500) % 60)}:${p(Math.floor(f / 25) % 60)}:${p(f % 25)}`; requestAnimationFrame(frame); };
@@ -192,12 +200,12 @@
       if (live) amb();
       const vids = [pgm, ...cams.filter(c => c.offsetParent).map(c => $('video', c))]; // hidden cams (small screens) never load
       if (live) {
-        vids.forEach(v => { load(v); if (!reduce) v.play().catch(() => {}); });
+        vids.forEach(v => { load(v); if (!reduce) play(v).catch(() => {}); });
         if (!reduce) { timer = timer || setInterval(tick, 4000); t0 = t0 || performance.now(); requestAnimationFrame(frame); }
       } else { vids.forEach(v => v.pause()); clearInterval(timer); timer = null; }
     }, { threshold: .25 }).observe($('.mv-grid', mv));
     const open = $('#mv-open'), all = $('#mv-all');
-    const aio = new IntersectionObserver(es => es.forEach(en => { const v = en.target; if (en.isIntersecting) { load(v); reduce || v.play().catch(() => {}); } else v.pause(); }), { rootMargin: '100px' });
+    const aio = new IntersectionObserver(es => es.forEach(en => { const v = en.target; if (en.isIntersecting) { load(v); reduce || play(v).catch(() => {}); } else v.pause(); }), { rootMargin: '100px' });
     open.addEventListener('click', () => {
       all.hidden = !all.hidden; open.setAttribute('aria-expanded', String(!all.hidden));
       open.textContent = all.hidden ? 'Xem tất cả 37 clip' : 'Thu gọn';
@@ -247,10 +255,10 @@
   if (hvid) {
     // poster paints first (LCP); the loop is attached after load so it never competes with the page
     const lite = reduce || (navigator.connection && navigator.connection.saveData);
-    const attach = () => { if (hvid.src || lite) return; hvid.src = innerWidth < 900 ? hvid.dataset.srcM : hvid.dataset.src; hvid.preload = 'auto'; };
+    const attach = () => { if (hvid.src || lite || noAuto) return; hvid.src = innerWidth < 900 ? hvid.dataset.srcM : hvid.dataset.src; hvid.preload = 'auto'; };
     if (document.readyState === 'complete') attach(); else addEventListener('load', attach, { once: true });
     setTimeout(attach, 3000);
-    if (!lite) new IntersectionObserver(([en]) => { if (en.isIntersecting) { attach(); hvid.play().catch(() => {}); } else hvid.pause(); }, { threshold: .05 }).observe(hvid);
+    if (!lite) new IntersectionObserver(([en]) => { if (en.isIntersecting) { attach(); play(hvid).catch(() => {}); } else hvid.pause(); }, { threshold: .05 }).observe(hvid);
   }
 
 
@@ -265,7 +273,7 @@
     if (deck) {
       const cards = $$('.d2-clip', deck), n = cards.length;
       let order = cards.map((_, i) => i), seen = false, t = null, busy = false;
-      const paint = () => cards.forEach((c, i) => { const p = order.indexOf(i), v = $('video', c); c.style.setProperty('--p', p); c.classList.toggle('top', p === 0); if (p <= 1 && seen && !v.src) v.src = v.dataset.src; if (p === 0 && seen && !reduce) v.play().catch(() => {}); else v.pause(); });
+      const paint = () => cards.forEach((c, i) => { const p = order.indexOf(i), v = $('video', c); c.style.setProperty('--p', p); c.classList.toggle('top', p === 0); if (p <= 1 && seen && !v.src) v.src = v.dataset.src; if (p === 0 && seen && !reduce) play(v).catch(() => {}); else v.pause(); });
       const next = () => {
         if (busy) return; busy = true;
         const top = cards[order[0]]; top.classList.add('lift');
@@ -507,14 +515,14 @@
     $$('.rt').forEach(t => {
       if (!set.has(t.dataset.yt)) return;
       let v = null;
-      t.addEventListener('pointerenter', () => { if (!v) { v = document.createElement('video'); v.muted = true; v.loop = true; v.playsInline = true; v.src = 'assets/video/loops/' + t.dataset.yt + '.mp4'; t.querySelector('.rt-img').appendChild(v); } v.play().then(() => v.classList.add('on')).catch(() => {}); });
+      t.addEventListener('pointerenter', () => { if (!v) { v = document.createElement('video'); v.muted = true; v.loop = true; v.playsInline = true; v.src = 'assets/video/loops/' + t.dataset.yt + '.mp4'; t.querySelector('.rt-img').appendChild(v); } play(v).then(() => v.classList.add('on')).catch(() => {}); });
       t.addEventListener('pointerleave', () => { if (v) { v.pause(); v.classList.remove('on'); } });
     });
   }).catch(() => {});
 
   /* ---- v9: hero showreel (assets/video/showreel.mp4, enabled by "showreel": true in media.json) ---- */
   const hv = $('.landing-video');
-  if (hv && !reduce) media.then(m => { if (!m.showreel) return; hv.src = hv.dataset.src; hv.play().then(() => hv.classList.add('on')).catch(() => {}); });
+  if (hv && !reduce) media.then(m => { if (!m.showreel) return; hv.src = hv.dataset.src; play(hv).then(() => hv.classList.add('on')).catch(() => {}); });
 
   /* ---- CINEMA: screening room (stage + rail + autoplay) ---- */
   const cin = $('.cinema');
