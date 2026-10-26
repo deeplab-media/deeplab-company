@@ -4,8 +4,8 @@
   const $ = (q, c = document) => c.querySelector(q);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const R = (document.currentScript && document.currentScript.dataset.root) || '';  // path back to the site root ('' or '../')
-  // count contact clicks in the cookieless visit counter when the site loads it (GoatCounter: totals only, no personal data)
-  const tally = (path, title) => { try { window.goatcounter && window.goatcounter.count && window.goatcounter.count({ path, title, event: true }); } catch (_) {} };
+  // count contact clicks in whichever cookieless counter the build loaded (GoatCounter totals, or Amplitude with no cookies / no IP)
+  const tally = (path, title) => { try { window.goatcounter && window.goatcounter.count && window.goatcounter.count({ path, title, event: true }); window.amplitude && window.amplitude.track && window.amplitude.track(title, { action: path, page: location.pathname }); } catch (_) {} };
   document.addEventListener('click', e => {
     const a = e.target.closest('a[href], #dc-open'); if (!a) return;
     const h = a.getAttribute('href') || '';
