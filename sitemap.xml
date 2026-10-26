@@ -97,6 +97,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://media.deeplabassist.vn/dich-vu/tiktok-thu-1-thang/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://media.deeplabassist.vn/kien-thuc/</loc>
     <lastmod>2026-10-26</lastmod>
     <priority>0.7</priority>
@@ -148,6 +153,11 @@
   </url>
   <url>
     <loc>https://media.deeplabassist.vn/nganh/nha-hang-cafe/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://media.deeplabassist.vn/nganh/shop-ban-le/</loc>
     <lastmod>2026-10-26</lastmod>
     <priority>0.7</priority>
   </url>
