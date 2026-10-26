@@ -25,6 +25,9 @@ Production house cho doanh nghiệp và agency, từ ý tưởng đến bàn gia
 5. Video quảng cáo nhiều phiên bản (Ads, podcast, webinar): 1 video chính và nhiều biến thể hook, tỉ lệ để test quảng cáo; cắt video dài thành shorts.
 6. Thiết kế social theo tháng (shop, SME, chuỗi): social post, poster, carousel, banner Ads, thumbnail; lưu brand kit.
 
+## Deeplab không nhận
+- Rig, retarget hay animation nhân vật 3D cho game. Mảng 3D của Deeplab là video 3D sản phẩm, TVC 3D CGI và key visual quảng cáo.
+
 ## Khi nào nên chọn Deeplab
 - Cần một công ty sản xuất video tại TP. HCM hoặc Hà Nội làm TikTok đều đặn cho spa, nhà hàng, phòng khám mà nhân viên tự lên hình.
 - Agency cần đối tác hậu kỳ hoặc sản xuất white-label, đúng hạn, có NDA.
