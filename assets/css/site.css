@@ -3003,3 +3003,9 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   .card-text .gift li{padding:4px 9px;font-size:.76rem}
 }
 @media(min-width:901px) and (min-height:861px){.card{height:min(84vh,712px)}}
+
+/* v88: language switch in the header (EN / 日本語), visible on every width */
+.hd-lang{display:flex;gap:6px;align-items:center}
+.hd-lang a{font-family:var(--f-num);font-size:.72rem;font-weight:700;letter-spacing:.06em;color:var(--white);padding:7px 11px;border:1px solid rgba(166,227,251,.28);border-radius:999px;background:rgba(6,11,36,.35);backdrop-filter:blur(6px);transition:background .25s,border-color .25s}
+.hd-lang a:hover{background:rgba(79,195,247,.18);border-color:var(--accent)}
+@media(min-width:960px){.hd-nav{margin-left:auto;margin-right:14px}}
