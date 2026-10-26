@@ -4,6 +4,16 @@
   const $ = (q, c = document) => c.querySelector(q);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const R = (document.currentScript && document.currentScript.dataset.root) || '';  // path back to the site root ('' or '../')
+  // count contact clicks in the cookieless visit counter when the site loads it (GoatCounter: totals only, no personal data)
+  const tally = (path, title) => { try { window.goatcounter && window.goatcounter.count && window.goatcounter.count({ path, title, event: true }); } catch (_) {} };
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href], #dc-open'); if (!a) return;
+    const h = a.getAttribute('href') || '';
+    if (a.id === 'dc-open') tally('mo-hoi-deeplab', 'Mở khung Hỏi Deeplab');
+    else if (h.includes('zalo.me')) tally('bam-zalo', 'Bấm Zalo');
+    else if (h.includes('m.me/')) tally('bam-messenger', 'Bấm Messenger');
+    else if (h.startsWith('mailto:')) tally('bam-email', 'Bấm Email');
+  }, true);
   const chat = $('#dl-chat');
   if (chat) {
     const ZALO = 'https://zalo.me/0345926347', MSG = 'https://m.me/61586418617853';
@@ -45,7 +55,7 @@
       const a = e.target.closest('a[href^="' + ZALO + '"]'); if (!a || a.closest('.dc-zalo')) return;
       e.preventDefault(); open(); zbox.hidden = false; zbox.scrollIntoView({ block: 'nearest' });
     }, true);
-    $('.dz-copy', chat).addEventListener('click', e => { const b = e.currentTarget; const done = () => { b.textContent = 'Đã sao chép 0345 926 347'; }; (navigator.clipboard ? navigator.clipboard.writeText(b.dataset.copy).then(done) : Promise.reject()).catch(() => { b.textContent = '0345 926 347'; }); });
+    $('.dz-copy', chat).addEventListener('click', e => { tally('chep-so-zalo', 'Chép số Zalo'); const b = e.currentTarget; const done = () => { b.textContent = 'Đã sao chép 0345 926 347'; }; (navigator.clipboard ? navigator.clipboard.writeText(b.dataset.copy).then(done) : Promise.reject()).catch(() => { b.textContent = '0345 926 347'; }); });
   }
 
 })();
