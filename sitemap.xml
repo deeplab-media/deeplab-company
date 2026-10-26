@@ -102,6 +102,21 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://media.deeplabassist.vn/khu-vuc/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://media.deeplabassist.vn/khu-vuc/tp-hcm/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://media.deeplabassist.vn/khu-vuc/ha-noi/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://media.deeplabassist.vn/kien-thuc/</loc>
     <lastmod>2026-10-26</lastmod>
     <priority>0.7</priority>
