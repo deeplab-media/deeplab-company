@@ -3058,3 +3058,14 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   .pipe-rows{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;-webkit-overflow-scrolling:touch;margin-inline:calc(-1 * var(--gutter));padding-inline:var(--gutter);scroll-padding-inline:var(--gutter)}
   .pipe-rows .prow3{flex:0 0 76%!important;scroll-snap-align:start}
 }
+
+/* ================= v91: phones — 3D section as short as possible; A–D drift in a loop instead of a scrollbar ================= */
+@media(max-width:700px){
+  .cgi-head .cgi-pts,.cgi-drag,#pipe{display:none!important}
+  .pipe-rows{scrollbar-width:none}.pipe-rows::-webkit-scrollbar{display:none}
+  .pipe-rows.is-marq{display:block;overflow:hidden;padding:0 0 4px;scroll-snap-type:none}
+  .pr-track{display:flex;width:max-content;animation:prmarq 55s linear infinite}
+  .pr-track.hold{animation-play-state:paused}
+  .pr-track>.prow3{flex:0 0 min(72vw,300px)!important;width:min(72vw,300px);margin-right:12px}
+}
+@keyframes prmarq{to{transform:translateX(-50%)}}

@@ -740,6 +740,17 @@
   const closeBox = () => { modal.classList.remove('is-open', 'is-gal'); gi = -1; lenis && lenis.start(); setTimeout(() => { box.innerHTML = ''; modal.hidden = true; }, 350); };
   $$('.work[data-yt]').forEach(el => el.addEventListener('click', () => openVideo(el.dataset.yt)));
   $$('[data-img]').forEach(el => el.addEventListener('click', () => openImg(el.dataset.img)));
+  // v91: phones — 3D projects A–D drift right to left in a slow loop (no scrollbar); a touch holds it for a moment
+  const prr = $('.pipe-rows');
+  if (prr && matchMedia('(max-width:700px)').matches && !reduce) {
+    const tr = document.createElement('div'), cards = [...prr.children];
+    tr.className = 'pr-track'; cards.forEach(c => tr.appendChild(c));
+    cards.forEach(c => { const k = c.cloneNode(true); k.setAttribute('aria-hidden', 'true'); k.querySelectorAll('[data-img]').forEach(x => { x.tabIndex = -1; x.addEventListener('click', () => openImg(x.dataset.img)); }); tr.appendChild(k); });
+    prr.appendChild(tr); prr.classList.add('is-marq');
+    near(prr, () => tr.querySelectorAll('img').forEach(i => { i.loading = 'eager'; }));
+    let hT; prr.addEventListener('touchstart', () => { clearTimeout(hT); tr.classList.add('hold'); }, { passive: true });
+    prr.addEventListener('touchend', () => { hT = setTimeout(() => tr.classList.remove('hold'), 1800); });
+  }
   // v60: vertical product films play from the site itself, with sound and controls (user tap, so the in-app guard skips them)
   const openClip = src => { box.classList.remove('is-img'); box.classList.add('is-clip'); box.innerHTML = `<video src="${src}" controls playsinline preload="auto"></video>`; openBox(); if (!noAuto) box.querySelector('video').play().catch(() => {}); };
   $$('[data-clip]').forEach(el => el.addEventListener('click', () => openClip(el.dataset.clip)));
