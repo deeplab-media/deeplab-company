@@ -3033,3 +3033,28 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 .pr-render{--h:min(380px,calc((100cqw - (var(--n) - 1) * 10px) / var(--sum) - 1px))}
 @media(max-width:1000px){.pipe{grid-template-columns:1fr}.pipe-stage{max-width:440px}}
 @media(max-width:700px){.tf-frame{border-radius:12px}.tf-tag{left:8px;top:8px;font-size:.62rem;padding:5px 9px}.tf-snd{right:8px;bottom:8px;padding:7px 10px;font-size:.7rem}.pipe-stage{max-width:360px}.pr-render{--h:220px;height:220px}}
+
+/* ================= v90: 3D projects A–D in one row (4 compact cards; swipe row on phones) ================= */
+.pipe-rows{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:stretch}
+.pipe-rows .prow3{display:flex!important;flex-direction:column;align-items:stretch!important;gap:12px;padding:14px!important;position:relative!important;top:auto!important;grid-template-areas:none}
+.pipe-rows .pr-head{gap:10px}
+.pipe-rows .pr-head h3{font-size:1rem;line-height:1.2}
+.pipe-rows .pr-head p{font-size:.68rem}
+.pipe-rows .pr-flow{display:block}
+.pipe-rows .pr-out,.pipe-rows .pr-renders{width:100%}  /* keep image boxes full width before lazy images load */
+.pipe-rows .pr-node.vp,.pipe-rows .pr-wire,.pipe-rows .pr-out>.pr-tag{display:none}
+.pipe-rows .pr-renders{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;overflow:visible!important;padding:0}
+.pipe-rows .pr-row{display:contents}
+.pipe-rows .pr-render{--h:auto!important;height:auto!important;width:100%;max-width:none!important;flex:none!important;aspect-ratio:1/1;border-radius:10px}
+.pipe-rows .pr-row:first-child .pr-render:first-child{grid-column:1/-1;aspect-ratio:4/5}
+/* show the first three renders whatever row they sit in: 1 large + 2 small */
+.pipe-rows .pr-render{display:block!important}
+.pipe-rows .pr-row:first-child .pr-render:nth-child(n+4),.pipe-rows .pr-row+.pr-row .pr-render:nth-child(n+3){display:none!important}
+.pipe-rows .pr-row:first-child:has(>.pr-render:nth-child(3))~.pr-row,.pipe-rows .pr-row:first-child:has(>.pr-render:nth-child(2))~.pr-row .pr-render:nth-child(n+2){display:none!important}
+.pipe-rows .pr-render img{width:100%;height:100%!important;object-fit:cover}
+.pipe-rows .pr-note{margin:0;font-size:.8rem;line-height:1.5;color:var(--text);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+@media(max-width:1000px){.pipe-rows{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){
+  .pipe-rows{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;-webkit-overflow-scrolling:touch;margin-inline:calc(-1 * var(--gutter));padding-inline:var(--gutter);scroll-padding-inline:var(--gutter)}
+  .pipe-rows .prow3{flex:0 0 76%!important;scroll-snap-align:start}
+}
