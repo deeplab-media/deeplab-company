@@ -243,7 +243,18 @@
     const open = i => { ci = (i + ps.length) % ps.length; ps.forEach((p, k) => { p.classList.toggle('is-on', k === ci); p.setAttribute('aria-pressed', String(k === ci)); }); };
     ps.forEach((p, k) => { p.addEventListener('mouseenter', () => open(k)); p.addEventListener('focus', () => open(k)); p.addEventListener('click', () => open(k)); });
     crRow.addEventListener('mouseenter', () => pause = true); crRow.addEventListener('mouseleave', () => pause = false);
-    if (!reduce) new IntersectionObserver(([en]) => { clearInterval(ct); if (en.isIntersecting) ct = setInterval(() => pause || open(ci + 1), 3200); }, { threshold: .4 }).observe(crRow);
+    // v92: narrow screens — the row is a swipe strip with no scrollbar; auto-advance also slides it, a touch or drag pauses it for a moment
+    const strip = matchMedia('(max-width:800px)');
+    let hold = 0; const holdOn = () => { hold = Date.now() + 5000; };
+    const slide = () => { if (strip.matches) crRow.scrollTo({ left: ps[ci].offsetLeft - ps[0].offsetLeft, behavior: reduce ? 'auto' : 'smooth' }); };
+    crRow.addEventListener('touchstart', holdOn, { passive: true });
+    let dx = null; // mouse drag on narrow desktop windows (no scrollbar to grab)
+    crRow.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && strip.matches) { dx = e.clientX + crRow.scrollLeft; holdOn(); } });
+    addEventListener('pointermove', e => { if (dx !== null) crRow.scrollLeft = dx - e.clientX; });
+    const nearest = () => { const x = crRow.scrollLeft, d = i => Math.abs(ps[i].offsetLeft - ps[0].offsetLeft - x); return ps.reduce((k, _, i) => d(i) < d(k) ? i : k, 0); };
+    addEventListener('pointerup', () => { if (dx === null) return; dx = null; open(nearest()); slide(); });
+    let sT; crRow.addEventListener('scroll', () => { clearTimeout(sT); sT = setTimeout(() => { if (strip.matches && dx === null) open(nearest()); }, 160); }, { passive: true });
+    if (!reduce) new IntersectionObserver(([en]) => { clearInterval(ct); if (en.isIntersecting) ct = setInterval(() => { if (pause && !strip.matches) return; if (Date.now() < hold) return; open(ci + 1); slide(); }, 3200); }, { threshold: .4 }).observe(crRow);
   }
 
 

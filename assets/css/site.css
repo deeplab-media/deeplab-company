@@ -3062,6 +3062,12 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 /* ================= v91: phones — 3D section as short as possible; A–D drift in a loop instead of a scrollbar ================= */
 @media(max-width:700px){
   .cgi-head .cgi-pts,.cgi-drag,#pipe{display:none!important}
+  /* heading block: the brand list repeats the A–D cards below, the intro becomes one short line */
+  .cgi-head .cgi-brands{display:none!important}
+  .sec-head.cgi-head{gap:10px;margin-bottom:18px}
+  .sec-head.cgi-head>.fine{font-size:.88rem!important;line-height:1.5}
+  .cgi-long{display:none}.cgi-short{display:inline!important}
+  .tvc-feat{margin-top:0}
   .pipe-rows{scrollbar-width:none}.pipe-rows::-webkit-scrollbar{display:none}
   .pipe-rows.is-marq{display:block;overflow:hidden;padding:0 0 4px;scroll-snap-type:none}
   .pr-track{display:flex;width:max-content;animation:prmarq 55s linear infinite}
@@ -3069,3 +3075,6 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   .pr-track>.prow3{flex:0 0 min(72vw,300px)!important;width:min(72vw,300px);margin-right:12px}
 }
 @keyframes prmarq{to{transform:translateX(-50%)}}
+.cgi-short{display:none}
+/* v92: crew strip (Direction, Camera…) on narrow screens: swipe/auto-slide, no scrollbar, mouse can drag */
+@media(max-width:800px){.cr-row{scrollbar-width:none;cursor:grab;user-select:none}.cr-row::-webkit-scrollbar{display:none}.cr-row img{-webkit-user-drag:none;pointer-events:none}}
