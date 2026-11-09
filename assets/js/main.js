@@ -448,7 +448,25 @@
     wireCache.set(src, p); return p;
   };
 
-  /* ---- v11: pipeline viewer (scroll or drag: wireframe -> clay -> render) ---- */
+  /* ---- v89: featured 3D TVC (self-hosted): muted loop while on screen + sound toggle; in-app browsers and reduced motion get a poster and tap to play with controls ---- */
+  const tf = $('#tf-v');
+  if (tf) {
+    const big = innerWidth > 900, snd = $('.tf-snd'), tap = $('.tf-play');
+    if (big) tf.poster = 'assets/img/p-tl027.webp';
+    const src = () => { if (!tf.getAttribute('src')) tf.src = big ? tf.dataset.src : tf.dataset.srcM; };
+    if (noAuto || reduce) {
+      snd.hidden = true; tap.hidden = false;
+      tap.addEventListener('click', () => { src(); tf.muted = false; tf.controls = true; tap.hidden = true; HTMLMediaElement.prototype.play.call(tf).catch(() => {}); });
+    } else {
+      new IntersectionObserver(([en]) => { if (en.isIntersecting) { src(); play(tf).catch(() => {}); } else tf.pause(); }, { threshold: .35 }).observe(tf);
+      snd.addEventListener('click', () => {
+        tf.muted = !tf.muted; snd.setAttribute('aria-pressed', String(!tf.muted)); snd.querySelector('span').textContent = tf.muted ? 'Bật âm thanh' : 'Tắt âm thanh';
+        if (!tf.muted) { tf.currentTime = 0; play(tf).catch(() => {}); }
+      });
+    }
+  }
+
+  /* ---- v11: pipeline viewer (drag: wireframe -> clay -> render) ---- */
   const pst = $('#pipe-stage');
   if (pst) {
     const range = $('#ps-range'), steps = $$('.ps-steps li'), modes = $$('.ps-modes span'), l1 = $('.ps-line.l1'), l2 = $('.ps-line.l2');
@@ -468,11 +486,8 @@
     load('g-10', 'g-09', 'Tea set');
     range.addEventListener('input', () => setP(+range.value));
     $$('.ps-switch button').forEach(b => b.addEventListener('click', () => { $$('.ps-switch button').forEach(x => x.classList.toggle('is-active', x === b)); load(b.dataset.clay, b.dataset.render, b.dataset.name); }));
-    if (hasGsap && !reduce && innerWidth > 1000) {
-      setP(0);
-      // hold the frame at screen centre (or near top if taller than the screen), then wipe layer by layer
-      ScrollTrigger.create({ trigger: '#pipe', pin: true, anticipatePin: 1, start: () => $('#pipe').offsetHeight > innerHeight * .9 ? 'top 80px' : 'center center', end: () => '+=' + Math.round(innerHeight * 1.4), scrub: .6, invalidateOnRefresh: true, onUpdate: s2 => setP(Math.round(s2.progress * 100)) });
-    } else if (!reduce) {
+    // v89: no pinned scroll any more (one swipe passes the section); the wipe plays once when the frame shows, drag to replay
+    if (!reduce) {
       setP(0);
       new IntersectionObserver((es, ob) => es.forEach(en => { if (!en.isIntersecting) return; ob.disconnect(); let t0 = null; const run = now => { t0 ??= now; const k = Math.min(1, (now - t0) / 3200); setP(Math.round(k * 100)); if (k < 1) requestAnimationFrame(run); }; requestAnimationFrame(run); }), { threshold: .5 }).observe(pst);
     } else setP(100);
